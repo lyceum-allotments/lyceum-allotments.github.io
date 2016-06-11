@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Lyceum Allotments</title>
+    <link>http://mysite.com/</link>
+    <description>Recent content on The Lyceum Allotments</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 07 Jun 2016 23:06:36 +0100</lastBuildDate>
+    <atom:link href="http://mysite.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Emscripten and SDL 2</title>
+      <link>http://mysite.com/2016/06/emscripten-and-sdl-2/</link>
+      <pubDate>Tue, 07 Jun 2016 23:06:36 +0100</pubDate>
+      
+      <guid>http://mysite.com/2016/06/emscripten-and-sdl-2/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction-to-llvm-emscripten-and-asm-js&#34;&gt;Introduction to LLVM, Emscripten and asm.js&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;#hellodiv&#34;&gt;hello&lt;/a&gt;
+JavaScript is a remarkable language, cobbled together in 10 days in 1995 and
+intended to be a forgiving language to enable simple pieces of interactivity to
+be incorporated into web pages, it now finds itself implemented in every
+graphical web-browser and the natural choice for writing client-side web-apps
+that run anywhere that will run a browser.&lt;/p&gt;
+
+&lt;p&gt;Rather like a drunken tattoo of Baphomet acquired at a time when you&amp;rsquo;d no idea
+you would later wish to join the clergy, the issue now is how to deal with the
+consequences of this unforseeable unfortunate choice. There are multiple
+options: the first is simply to join the occult, JavaScript has its redeeming
+features (as, I&amp;rsquo;m sure, so does Satanism) and some espouse adopting it on
+&lt;strong&gt;both&lt;/strong&gt; the client and server side of things, node.js facilitates, this while
+MongoDB and CouchDB allow even database queries to be scripted in JavaScript.&lt;/p&gt;
+
+&lt;div id=&#34;hellodiv&#34;&gt;
+Another option when confronted with an unwanted tattoo of a Satanic goat etched
+onto your chest (we&#39;ve all been there) is to embilish it and render it less
+offensive to whatever type of people it is normally make up the interview panel
+for vicar school, altering it so it resembles a much-missed former family pet,
+say, or a favourite Disney character. This is the path favoured by JavaScript
+libraries such as jQuery or MooTools, libraries which take JavaScript and build,
+using JavaScript, a better JavaScript - one with nice functional programming
+constructs and sane universal ways of accessing the DOM.
+&lt;/div&gt;
+
+&lt;p&gt;There is, however, a third way to hide your ill-advised ink, this is the route
+chosen by Emscripten and the subject of this tutorial - it is simply to to cover
+it up. The Satanic symbol will remain there underneath but the outside world can
+deal with something much more old-fashioned and acceptable, like a Fair Isle
+patterned jumper, or, as in Escripten&amp;rsquo;s case, C++.&lt;/p&gt;
+
+&lt;p&gt;Emscripten&amp;rsquo;s functionality is simple, it takes normal C or C++, and with the
+help of parts of the LLVM compiler tool-chain produces not assembler code as
+normal compilers do, but JavaScript that can run in any (modern) browser.&lt;/p&gt;
+
+&lt;p&gt;There are a number of advantages of this. Firstly, if you don&amp;rsquo;t know JavaScript
+but do know C++, you can write C++, not JavaScript. Secondly, you get to take
+advantage of using a strongly-typed language if you like that sort of thing. A
+strict compiler with static analysis, whilst being occassionally frustrating,
+can catch a large number of bugs before the compiler even lets you run your
+code, bugs that the more forgiving JavaScript will often leave for your users to
+discover. Finally, it is possible to use the fact that C/C++ is a language
+designed to be compiled into optimised assembler, running quicker than assembler
+any human could write, to compile C/C++ into optimised JavaScript that runs
+quicker than JavaScript any human could write.&lt;/p&gt;
+
+&lt;p&gt;This optimised subset of JavaScript is known as asm.js, a strict sub-set of
+JavaScript where the features chosen to be included are designed to be suitable
+for being aggressively optimised by JavaScript interpreters. The specific subset
+of asm.js was originally chosen and designed by Mozilla, and a highly optimised
+interpretter inplemented as part of the Firefox browser, but implementations of
+optimised asm.js interpretters are now implemented into the Chrome and Edge
+browsers.&lt;/p&gt;
+
+&lt;p&gt;[1]: Emscripten can be seen as more or less a drop-in replacement for gcc or clang,
+C/C++ files are compiled and linked into a JavaScript executable which can then
+be incorporated into a website and run in any web-browser. That it can compile
+C/C++ with few alterations means that it is suited to compiling existing
+libraries and making their functionality available in the browser with minimal
+effort. Thus, rather than writing a 2D physics engine in JavaScript, and pulling
+your hair out trying to get it to run fast enough to power your simulation of
+irritable birds before your game is beaten to market, you can simply compile an
+existing C/C++ library like Bullet and job done. As an illustration of what
+web-browsers can achieve if you only ask them nicely, some show-offs compiled
+the Unreal 3D game engine into asm.js and the results are very impressive
+indeed.&lt;/p&gt;
+
+&lt;p&gt;This tutorial series will put you on the path to becoming that impressive, using
+an Emscripten port of SDL2 to implement all the basic components of a game,
+loading and displaying an image, moving it, and listening for user input. SDL2
+was designed to be a thin layer of abstraction over a computer&amp;rsquo;s graphics,
+input, and audio components, and so it proves in JavaScript, the port of SDL2
+enables you to effortless, and while barely noticing it, leverage technologies
+webGL and so you can rest at ease that your application will be using the
+client&amp;rsquo;s native graphics drivers if the brower supports it.&lt;/p&gt;
+
+&lt;p&gt;Before we start all that though we should concentrate on walking before we can
+run and start off the same way that any adventure in silicon tends to start, by
+corralling Emscripten to say &amp;lsquo;hello world&amp;rsquo;.&lt;/p&gt;
+
+&lt;h2 id=&#34;hello-world&#34;&gt;&amp;lsquo;Hello World&amp;rsquo;&lt;/h2&gt;
+
+&lt;p&gt;The Emscripten SDK containing the Emscripten compiler can be downloaded
+&lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html&#34;&gt;here&lt;/a&gt;.
+On Linux and MacOS some dependencies need to be installed prior to installing
+the compiler, details of these and instructions for their installation can be
+found &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html#platform-notes-installation-instructions-portable-sdk&#34;&gt;here&lt;/a&gt;
+but after those are dealt with the installlation of Emscripten itself is quite
+straightforward, if you&amp;rsquo;re using the portable SDK it&amp;rsquo;s a case of unzipping it in
+a convenient place, changing into the &amp;lsquo;emsdk_portable&amp;rsquo; directory and running the
+following commands which fetch the latest online tools from the web, installs
+them, and makes them active:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emsdk&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;update&lt;/span&gt; 
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emsdk&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;install&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;latest&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emsdk&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;activate&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;latest&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Linux and MacOS X require a further step to set the system path to the active
+version of Emscripten:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;source&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emsdk_env.sh&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+</description>
+    </item>
+    
+  </channel>
+</rss>

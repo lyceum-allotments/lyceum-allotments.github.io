@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL 2</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://mysite.com//css/skeleton.css">
+		<link rel="stylesheet" href="http://mysite.com//css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://mysite.com/" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://mysite.com/series">projects</a>
+					
+					
+					
+					<a class="navbar-link" href="https://github.com/esell/">code</a>
+					
+					
+					
+					<a class="navbar-rlink" href="http://mysite.com/contact">contact</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			
+			<div class="row">
+				<div class="twelve columns" >
+					<img class="u-max-full-width" src="http://mysite.com//img/City-Under-Heat.jpg">
+				</div>
+			</div>
+			
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://mysite.com/2016/06/emscripten-and-sdl-2/">Emscripten and SDL 2</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by  on Jun 07, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		
+
+<h2 id="introduction-to-llvm-emscripten-and-asm-js">Introduction to LLVM, Emscripten and asm.js</h2>
+
+<p><a href="#hellodiv">hello</a>
+JavaScript is a remarkable language, cobbled together in 10 days in 1995 and
+intended to be a forgiving language to enable simple pieces of interactivity to
+be incorporated into web pages, it now finds itself implemented in every
+graphical web-browser and the natural choice for writing client-side web-apps
+that run anywhere that will run a browser.</p>
+
+<p>Rather like a drunken tattoo of Baphomet acquired at a time when you&rsquo;d no idea
+you would later wish to join the clergy, the issue now is how to deal with the
+consequences of this unforseeable unfortunate choice. There are multiple
+options: the first is simply to join the occult, JavaScript has its redeeming
+features (as, I&rsquo;m sure, so does Satanism) and some espouse adopting it on
+<strong>both</strong> the client and server side of things, node.js facilitates, this while
+MongoDB and CouchDB allow even database queries to be scripted in JavaScript.</p>
+
+<div id="hellodiv">
+Another option when confronted with an unwanted tattoo of a Satanic goat etched
+onto your chest (we've all been there) is to embilish it and render it less
+offensive to whatever type of people it is normally make up the interview panel
+for vicar school, altering it so it resembles a much-missed former family pet,
+say, or a favourite Disney character. This is the path favoured by JavaScript
+libraries such as jQuery or MooTools, libraries which take JavaScript and build,
+using JavaScript, a better JavaScript - one with nice functional programming
+constructs and sane universal ways of accessing the DOM.
+</div>
+
+<p>There is, however, a third way to hide your ill-advised ink, this is the route
+chosen by Emscripten and the subject of this tutorial - it is simply to to cover
+it up. The Satanic symbol will remain there underneath but the outside world can
+deal with something much more old-fashioned and acceptable, like a Fair Isle
+patterned jumper, or, as in Escripten&rsquo;s case, C++.</p>
+
+<p>Emscripten&rsquo;s functionality is simple, it takes normal C or C++, and with the
+help of parts of the LLVM compiler tool-chain produces not assembler code as
+normal compilers do, but JavaScript that can run in any (modern) browser.</p>
+
+<p>There are a number of advantages of this. Firstly, if you don&rsquo;t know JavaScript
+but do know C++, you can write C++, not JavaScript. Secondly, you get to take
+advantage of using a strongly-typed language if you like that sort of thing. A
+strict compiler with static analysis, whilst being occassionally frustrating,
+can catch a large number of bugs before the compiler even lets you run your
+code, bugs that the more forgiving JavaScript will often leave for your users to
+discover. Finally, it is possible to use the fact that C/C++ is a language
+designed to be compiled into optimised assembler, running quicker than assembler
+any human could write, to compile C/C++ into optimised JavaScript that runs
+quicker than JavaScript any human could write.</p>
+
+<p>This optimised subset of JavaScript is known as asm.js, a strict sub-set of
+JavaScript where the features chosen to be included are designed to be suitable
+for being aggressively optimised by JavaScript interpreters. The specific subset
+of asm.js was originally chosen and designed by Mozilla, and a highly optimised
+interpretter inplemented as part of the Firefox browser, but implementations of
+optimised asm.js interpretters are now implemented into the Chrome and Edge
+browsers.</p>
+
+<p>[1]: Emscripten can be seen as more or less a drop-in replacement for gcc or clang,
+C/C++ files are compiled and linked into a JavaScript executable which can then
+be incorporated into a website and run in any web-browser. That it can compile
+C/C++ with few alterations means that it is suited to compiling existing
+libraries and making their functionality available in the browser with minimal
+effort. Thus, rather than writing a 2D physics engine in JavaScript, and pulling
+your hair out trying to get it to run fast enough to power your simulation of
+irritable birds before your game is beaten to market, you can simply compile an
+existing C/C++ library like Bullet and job done. As an illustration of what
+web-browsers can achieve if you only ask them nicely, some show-offs compiled
+the Unreal 3D game engine into asm.js and the results are very impressive
+indeed.</p>
+
+<p>This tutorial series will put you on the path to becoming that impressive, using
+an Emscripten port of SDL2 to implement all the basic components of a game,
+loading and displaying an image, moving it, and listening for user input. SDL2
+was designed to be a thin layer of abstraction over a computer&rsquo;s graphics,
+input, and audio components, and so it proves in JavaScript, the port of SDL2
+enables you to effortless, and while barely noticing it, leverage technologies
+webGL and so you can rest at ease that your application will be using the
+client&rsquo;s native graphics drivers if the brower supports it.</p>
+
+<p>Before we start all that though we should concentrate on walking before we can
+run and start off the same way that any adventure in silicon tends to start, by
+corralling Emscripten to say &lsquo;hello world&rsquo;.</p>
+
+<h2 id="hello-world">&lsquo;Hello World&rsquo;</h2>
+
+<p>The Emscripten SDK containing the Emscripten compiler can be downloaded
+<a href="https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html">here</a>.
+On Linux and MacOS some dependencies need to be installed prior to installing
+the compiler, details of these and instructions for their installation can be
+found <a href="https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html#platform-notes-installation-instructions-portable-sdk">here</a>
+but after those are dealt with the installlation of Emscripten itself is quite
+straightforward, if you&rsquo;re using the portable SDK it&rsquo;s a case of unzipping it in
+a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and running the
+following commands which fetch the latest online tools from the web, installs
+them, and makes them active:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">update</span> 
+<span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">latest</span>
+<span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">activate</span> <span style="color: #f8f8f2">latest</span>
+</pre></div>
+
+
+<p>Linux and MacOS X require a further step to set the system path to the active
+version of Emscripten:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">source</span> <span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk_env.sh</span>
+</pre></div>
+
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

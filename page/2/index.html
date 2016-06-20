@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>The Lyceum Allotments</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/lyceum_allotments.png">
+				</div>
+			</div>
+
+
+
+
+
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/">Emscripten and SDL2 Tutorial Part 5: Move, Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			We can now use SDL2 to load and display an image. The next step is to learn how to move this image, and then to use SDL&rsquo;s functions to listen for user input in order to control the movement. Moving the image turns out to be one of those things that needs to be done a little differently to how it is normally done in native C/C++ programs. On those occassions you typically have a main event loop and inside that main loop you increment the position of the image a small amount on each iteration, something like this: /** * Initialise SDL and open window and renderer here */ bool carry_on = true; SDL_Surface *image = IMG_Load(&quot;assets/owl.png&quot;); SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, image); int x = 0; /** * Have an infinite loop...
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/">Emscripten and SDL2 Tutorial Part 6: Write Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			One final component of a game that I will cover in this tutorial is text. Having a look at the available Emscripten ports (emcc --show-ports) will reveal a library called SDL2_ttf is at your disposal. This is a library that enables you render true type fonts into an SDL_Surface, that can then be rendered in a similar fashion to what we&rsquo;ve done previously. --show-ports tells us that the command line argument we need to pass to emcc is -s USE_SDL_TTF=2 so all we need to do is add that to our command line, giving us&hellip; emcc write_owl.c -O2 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=&#39;[&quot;png&quot;]&#39; \ -s USE_SDL2_TTF=2 --preload-file assets -o write_owl.html in our code we need to remember to include the SDL_TTF header file: #include &lt;SDL/SDL_ttf.h&gt; and then we can use the SDL_TTF functions to load a true type font (that we have uploaded to our virtual filesystem, like our image, by placing in a preloaded directory) using: TTF_Font *TTF_OpenFont(const char * file_path, int ptsize) where file_path is the path to the true type font in the virtual filesystem, and ptsize is the size of the font.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/">Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			We&rsquo;re so close to being able to make the perfect game you can almost taste it, there&rsquo;s just a few things in our way &ndash; all that &lsquo;powered by Emscripten&rsquo; gumpf that associates itself with or masterwork every time we get Emscripten to generate some HTML for us. That console might come in very useful when we were needing to debug things, but now we&rsquo;re convinced that our code is completely, absolutely, bug free and we don&rsquo;t need those crutches any more!
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/">Emscripten and SDL2 Tutorial Part 8: Making Something Practical</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			At long last we&rsquo;ve reached a position where we can make a 2D game that is something like fully functional. As an illustration I&rsquo;ve made a simple version of Snake, which can act as a guide for any projects that you&rsquo;d like to do. It doesn&rsquo;t really cover anything conceptually new that we haven&rsquo;t covered before, there&rsquo;s just more of it, with multiple source files to be compiled. One problem that will be encountered if you just try and compile it using the previous command is that when you try and run the program you&rsquo;ll be told that you&rsquo;ve run out of memory.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve columns">
+		<center>
+			
+			<a href="/" class="arrow-link"><i class="fa fa-arrow-circle-left fa-2x"></i></a>
+			
+			
+		</center>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

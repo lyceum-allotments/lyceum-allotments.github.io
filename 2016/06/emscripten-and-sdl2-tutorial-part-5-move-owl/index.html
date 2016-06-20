@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL2 Tutorial Part 5: Move, Owl</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/">Emscripten and SDL2 Tutorial Part 5: Move, Owl</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>We can now use SDL2 to load and display an image. The next step is to learn how
+to move this image, and then to use SDL&rsquo;s functions to listen for user input in
+order to control the movement.</p>
+
+<p>Moving the image turns out to be one of those things that needs to be done a
+little differently to how it is normally done in native C/C++ programs. On those
+occassions you typically have a main event loop and inside that main loop you
+increment the position of the image a small amount on each iteration, something
+like this:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">/**</span>
+<span style="color: #75715e"> * Initialise SDL and open window and renderer here</span>
+<span style="color: #75715e"> */</span>
+
+<span style="color: #66d9ef">bool</span> <span style="color: #f8f8f2">carry_on</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">true;</span>
+
+<span style="color: #f8f8f2">SDL_Surface</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">image</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">IMG_Load(</span><span style="color: #e6db74">&quot;assets/owl.png&quot;</span><span style="color: #f8f8f2">);</span>
+<span style="color: #f8f8f2">SDL_Texture</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">tex</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">SDL_CreateTextureFromSurface(renderer,</span> <span style="color: #f8f8f2">image);</span>
+<span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">x</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+
+
+<span style="color: #75715e">/**</span>
+<span style="color: #75715e"> * Have an infinite loop...</span>
+<span style="color: #75715e"> */</span>
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">(carry_on)</span>
+<span style="color: #f8f8f2">{</span>
+  <span style="color: #75715e">/**</span>
+<span style="color: #75715e">   * Clear the screen</span>
+<span style="color: #75715e">   */</span>
+  <span style="color: #f8f8f2">SDL_RenderClear(renderer);</span>
+
+  <span style="color: #75715e">/**</span>
+<span style="color: #75715e">   * Create a rectangle to copy the image into, with the x</span>
+<span style="color: #75715e">   * location of the image set to the value of the </span>
+<span style="color: #75715e">   * variable x that will be incremented in the loop</span>
+<span style="color: #75715e">   */</span>
+  <span style="color: #f8f8f2">SDL_Rect</span> <span style="color: #f8f8f2">dest</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{.x</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">x,</span> <span style="color: #f8f8f2">.y</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">100</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">.w</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">200</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">.h</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">200</span><span style="color: #f8f8f2">};</span>
+
+  <span style="color: #75715e">/**</span>
+<span style="color: #75715e">   * Copy the image into the renderer in the new location</span>
+<span style="color: #75715e">   * defined by dest</span>
+<span style="color: #75715e">   */</span>
+  <span style="color: #f8f8f2">SDL_RenderCopy</span> <span style="color: #f8f8f2">(renderer,</span> <span style="color: #f8f8f2">tex,</span> <span style="color: #f8f8f2">NULL,</span> <span style="color: #f92672">&amp;</span><span style="color: #f8f8f2">dest);</span>
+
+  <span style="color: #75715e">/**</span>
+<span style="color: #75715e">   * Render the screen</span>
+<span style="color: #75715e">   */</span>
+  <span style="color: #f8f8f2">SDL_RenderPresent(renderer);</span>
+  
+  <span style="color: #75715e">/**</span>
+<span style="color: #75715e">   * Increment x by 5 pixels, ensuring that next time we</span>
+<span style="color: #75715e">   * render the image it is drawn to the right 5 pixels</span>
+<span style="color: #75715e">   */</span>
+  <span style="color: #f8f8f2">x</span> <span style="color: #f92672">+=</span> <span style="color: #ae81ff">5</span><span style="color: #f8f8f2">;</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+
+<p>The problem of doing this in JavaScript is related to how JavaScript is run in
+the browser. The browser event model uses cooperative multitasking as a
+multitasking model, this means that each event must voluntarily give control
+back to the process scheduler which can then allow another process to run for a
+while (until that, in turn, gives control back to the process scheduler). When
+an infinite loop is implemented in the manner above the JavaScript running
+process will never give control back to the browser and so no other processes in
+your browser will be able to run (in actuality, your browser will detect this and
+offer you the chance to shut down the offending process).</p>
+
+<p>Luckily, the Emscripten C API provides us with some functions that act like an
+infinite loop, whilst playing nice and sharing, giving control back to the
+browser periodically so that other things can be done. The one we will use here
+is <a href="https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_set_main_loop_arg"><code>emscripten_set_main_loop_arg</code></a>,
+defined in the header file <code>emscripten.h</code>:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_set_main_loop_arg(em_arg_callback_func</span> <span style="color: #f8f8f2">func,</span> <span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">arg,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">fps,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">simulate_infinite_loop)</span>
+</pre></div>
+
+
+<p>Here, <code>func</code> is a function pointer to a function taking a void pointer as an
+argument, <code>arg</code> is the void pointer that will be passed as an argument, <code>fps</code> is the
+number of times per second that you wish <code>func</code> to be called and
+the <code>simulate_infinite_loop</code> arguement we will get to in a moment.</p>
+
+<p>It turns out that modern browsers support a method on the <code>window</code> DOM object
+specifically for the purposes of animation. This is
+<code>window.requestAnimationFrame()</code> and calls a function repeatedly at the same rate
+as the browser refresh rate. If you&rsquo;re using the main loop for updating graphics
+(as we will be) it is a waste of resources to update the image at a greater rate
+than the browser is refreshing. By passing an <code>fps</code> argument to
+<code>emscripten_set_main_loop_arg</code> equal to -1 Emscripten will use
+<code>requestAnimationFrame</code> under the bonnet and so you will not refresh the graphics
+faster than the browser, in general, it is a good idea to do this.</p>
+
+<p>To get out of the main loop, Emscripten provides the function
+<a href="https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_cancel_main_loop"><code>emscripten_cancel_main_loop</code></a>:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_cancel_main_loop(</span><span style="color: #66d9ef">void</span><span style="color: #f8f8f2">)</span>
+</pre></div>
+
+
+<p>which when called will simply stop the main loop looping. It&rsquo;s important to note
+though, that the loop handler will not return.</p>
+
+<p>Here&rsquo;s a simple example using <code>emscripten_set_main_loop_arg</code> and
+<code>emscripten_canel_main_loop</code> to pass an integer to a loop function and increment
+it until it equals 100 at which point the looping is stopped:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
+
+<span style="color: #75715e">/**</span>
+<span style="color: #75715e"> * Provides emscripten_set_main_loop_arg and emscripten_cancel_main_loop</span>
+<span style="color: #75715e"> */</span>
+<span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;emscripten.h&gt;</span>
+
+<span style="color: #75715e">/**</span>
+<span style="color: #75715e"> * A context structure that we can use for passing variables to our loop</span>
+<span style="color: #75715e"> * function, in this case it just contains a single integer</span>
+<span style="color: #75715e"> */</span>
+<span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">context</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">x;</span>
+<span style="color: #f8f8f2">};</span>
+
+<span style="color: #75715e">/**</span>
+<span style="color: #75715e"> * The loop handler, will be called repeatedly</span>
+<span style="color: #75715e"> */</span>
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">loop_fn</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">arg)</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">context</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">ctx</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">arg;</span>
+
+    <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;x: %d</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">ctx</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">x);</span>
+
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(ctx</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">x</span> <span style="color: #f92672">&gt;=</span> <span style="color: #ae81ff">100</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #f8f8f2">{</span>
+        <span style="color: #75715e">/**</span>
+<span style="color: #75715e">         * After 101 iterations, stop looping</span>
+<span style="color: #75715e">         */</span>
+        <span style="color: #f8f8f2">emscripten_cancel_main_loop();</span>
+        <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;got here...</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #66d9ef">return</span><span style="color: #f8f8f2">;</span>
+    <span style="color: #f8f8f2">}</span>
+
+    <span style="color: #f8f8f2">ctx</span><span style="color: #f92672">-&gt;</span><span style="color: #f8f8f2">x</span> <span style="color: #f92672">+=</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">;</span>
+<span style="color: #f8f8f2">}</span>
+
+<span style="color: #66d9ef">int</span> <span style="color: #a6e22e">main</span><span style="color: #f8f8f2">()</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">context</span> <span style="color: #f8f8f2">ctx;</span>
+    <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">simulate_infinite_loop</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">;</span>
+
+    <span style="color: #f8f8f2">ctx.x</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+
+    <span style="color: #f8f8f2">emscripten_set_main_loop_arg(loop_fn,</span> <span style="color: #f92672">&amp;</span><span style="color: #f8f8f2">ctx,</span> <span style="color: #f92672">-</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">simulate_infinite_loop);</span>
+
+    <span style="color: #75715e">/**</span>
+<span style="color: #75715e">     * If simulate_infinite_loop = 0, emscripten_set_main_loop_arg won&#39;t block</span>
+<span style="color: #75715e">     * and this code will run straight away.</span>
+<span style="color: #75715e">     * If simulate_infinite_loop = 1 then this code will not be reached</span>
+<span style="color: #75715e">     */</span>
+    <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;quitting...</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+
+<p>[<a href="/code/loop_test.tar.gz">loop_test.tar.gz</a>,
+<a href="/code/loop_test.zip">loop_test.zip</a>]</p>
+
+<p>This example can be simply altered to illustrate the effect of the
+<code>simulate_infinite_loop</code> argument given to <code>emscripten_set_main_loop_arg</code>. When it
+is set to 0, the call to <code>emscripten_set_main_loop_arg</code> won&rsquo;t block, code after it
+will execute simulataneously to the looping. This means that if you have
+clean-up code after your main loop has finished, you risk calling it and cleaning
+up stuff that your main loop might still need. Setting <code>simulate_infinite_loop</code> to
+1 will prevent this from happening, and the compiled JavaScript will stop the
+execution of the caller at this point. This means that the code after the loop
+will never be reached, note that this means it won&rsquo;t be reached even after
+<code>emscripten_cancel_main_loop</code> is called!</p>
+
+<p>With a straight-forward application of these principles we can alter our
+<code>hello_owl</code> program so that we can listen to user input and move the owl picture
+as appropriate. All we have to do is poll the SDL event system on each loop
+iteration to check if the user has pressed any buttons and if so to react
+appropriately. Depending on what button was pressed the destination rectangle
+that the owl image is rendered into is moved.</p>
+
+<p>An example implementing this can be seen and source-code downloaded below:</p>
+
+<p>[<a href="/pages/move_owl.html">move_owl.html</a>, <a href="/code/move_owl.tar.gz">move_owl.tar.gz</a>,
+<a href="/code/move_owl.zip">move_owl.zip</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL2 Tutorial Part 8: Making Something Practical</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/">Emscripten and SDL2 Tutorial Part 8: Making Something Practical</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>At long last we&rsquo;ve reached a position where we can make a 2D game that is
+something like fully functional. As an illustration I&rsquo;ve made a simple version
+of Snake, which can act as a guide for any projects that you&rsquo;d like to do.</p>
+
+<p>It doesn&rsquo;t really cover anything conceptually new that we haven&rsquo;t covered
+before, there&rsquo;s just more of it, with multiple source files to be compiled. One
+problem that will be encountered if you just try and compile it using the
+previous command is that when you try and run the program you&rsquo;ll be told that
+you&rsquo;ve run out of memory.</p>
+
+<p>For dynamic memory, Emscripten declares a JavaScript typed array and passes
+&lsquo;pointers&rsquo; to that whenever the program requests some dynamic memory. To deal
+with a memory problem we simply need to make this typed array larger. By passing
+the command line argument <code>-s TOTAL_MEMORY=67108864</code> to <code>emcc</code> a typed array of
+size 67108864 bytes (that is, 2^26 bytes) will be used, which should be enough.</p>
+
+<p>If you&rsquo;re not sure how much memory your program is going to use it is possible
+to pass the <code>emcc</code> command line argument <code>-s ALLOW_MEMORY_GROWTH=1</code> which allows
+the memory array to grow if needs be, but this involves a performance cost.</p>
+
+<p>[<a href="/pages/snake.html">snake.html</a>, <a href="/code/snake.tar.gz">snake.tar.gz</a>,
+<a href="/code/snake.zip">snake.zip</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

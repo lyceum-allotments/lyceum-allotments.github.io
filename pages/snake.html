@@ -1,0 +1,69 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+    body {
+        background-image: url("snake_assets/sand_tile.png");
+        background-repeat: repeat;
+    }
+
+    canvas.emscripten {
+        border: 0px none;
+        margin-left:auto;
+        margin-right:auto;
+        display:block
+    }
+
+    p#fullScreenButton {
+        text-align: center;
+        background-color: #f02ed3;
+        font-family: Sans-Serif;
+        padding: 10px;
+        cursor: default;
+    }
+</style>
+    </head>
+
+    <body>
+        <div style="width:800px; margin-left:auto; margin-right:auto">
+        <img src="snake_assets/logo.png">
+        </div>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+      <div style="width:200px; margin-left:auto; margin-right:auto">
+      <p id="fullScreenButton" onclick="Module.requestFullScreen(true, false)">Click for full-screen</p>
+      </div>
+
+
+
+    <script type='text/javascript'>
+        var Module = {
+            canvas: (function() {
+                var canvas = document.getElementById('canvas');
+                return canvas;
+                })()
+        };
+    </script>
+    <script>
+
+          (function() {
+            var memoryInitializer = 'snake.js.mem';
+            if (typeof Module['locateFile'] === 'function') {
+              memoryInitializer = Module['locateFile'](memoryInitializer);
+            } else if (Module['memoryInitializerPrefixURL']) {
+              memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
+            }
+            var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+            xhr.open('GET', memoryInitializer, true);
+            xhr.responseType = 'arraybuffer';
+            xhr.send(null);
+          })();
+
+          var script = document.createElement('script');
+          script.src = "snake.js";
+          document.body.appendChild(script);
+
+</script>
+
+    </body>
+</html>

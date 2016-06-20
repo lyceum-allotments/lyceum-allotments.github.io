@@ -38,15 +38,15 @@ ga('send', 'pageview');
 					
 					
 					
-					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">projects</a>
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
 					
 					
 					
-					<a class="navbar-link" href="https://github.com/esell/">code</a>
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
 					
 					
 					
-					<a class="navbar-rlink" href="http://lyceum-allotments.github.io/contact">contact</a>
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
 					
 					
 					
@@ -54,13 +54,11 @@ ga('send', 'pageview');
 			</div>
 		</div>
 		<div class="container">
-			
 			<div class="row">
 				<div class="twelve columns" >
-					<img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/City-Under-Heat.jpg">
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/lyceum_allotments.png">
 				</div>
 			</div>
-			
 
 
 
@@ -69,20 +67,95 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2/">Emscripten and SDL 2</a>
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/">Emscripten and SDL 2 Tutorial Part 1</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Introduction to LLVM, Emscripten and asm.js hello JavaScript is a remarkable language, cobbled together in 10 days in 1995 and intended to be a forgiving language to enable simple pieces of interactivity to be incorporated into web pages, it now finds itself implemented in every graphical web-browser and the natural choice for writing client-side web-apps that run anywhere that will run a browser. Rather like a drunken tattoo of Baphomet acquired at a time when you&rsquo;d no idea you would later wish to join the clergy, the issue now is how to deal with the consequences of this unforseeable unfortunate choice.
+			Emscripten is a compiler that allows you to take standard C/C++ and compile it to JavaScript, making it possible to port your C/C++ programs and run them in any modern browser. This tutorial series aims to be your guide and lead you to using the SDL2 library to implement all the basic components of a 2D game; showing an image, moving an image and listening for user input, and enabling you to make a game like this example of &lsquo;snake&rsquo; with relative ease in C/C++, all without writing a single line of JavaScript.
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by  on Jun 07, 2016</span>
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/">Emscripten and SDL2 Tutorial Part 2: Introduction to LLVM, Emscripten and asm.js</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			JavaScript is a remarkable language, cobbled together in 10 days in 1995 and intended to be a forgiving language to enable simple pieces of interactivity to be incorporated into web pages, it now finds itself implemented in every graphical web-browser and the natural choice for writing client-side web-apps that run anywhere that will run a browser. Rather like a drunken tattoo of Baphomet acquired at a time when you&rsquo;d no idea you would later wish to join the clergy, the issue now is how to deal with the consequences of this unforseeable unfortunate choice.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/">Emscripten and SDL2 Tutorial Part 3: Hello World</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			The Emscripten SDK containing the Emscripten compiler can be downloaded here. On Linux and MacOS some dependencies need to be installed prior to installing the compiler, details of these and instructions for their installation can be found here but after those are dealt with the installlation of Emscripten itself is quite straightforward; if you&rsquo;re using the portable SDK it&rsquo;s a case of unzipping it in a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and running the following commands which fetch the latest online tools from the web, installs them, and makes them active: ./emsdk update ./emsdk install latest ./emsdk activate latest Linux and MacOS X require a further step to set the system path to the active version of Emscripten: source ./emsdk_env.sh If all this has worked as it should, you should have the Emscripten compiler, emcc, at the file path ./emscripten/master/emcc in the emsdk_portable directory you downloaded.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/">Emscripten and SDL2 Tutorial Part 4: Look, Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			Although you can do plenty of interesting things with just logic and text, to impress the man on the Clapham omnibus these days you generally need to do something graphical. To this end we&rsquo;ll now write a program to load and show this fetching picture of an owl coughing up a pellet: Solving this problem can be broken down into two broad stages: firstly how do we refer to the image of an owl stored on a server&rsquo;s file system when it will be viewed in a web-page visited from the client&rsquo;s computer where JavaScript runs in a sandboxed environment?
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -96,6 +169,8 @@ ga('send', 'pageview');
 	<div class="twelve columns">
 		<center>
 			
+			
+			<a href="/page/2/" class="arrow-link"><i class="fa fa-arrow-circle-right fa-2x"></i></a>
 			
 		</center>
 	</div>

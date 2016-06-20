@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL2 Tutorial Part 6: Write Owl</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/">Emscripten and SDL2 Tutorial Part 6: Write Owl</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>One final component of a game that I will cover in this tutorial is text.
+Having a look at the available Emscripten ports (<code>emcc --show-ports</code>) will
+reveal a library called <a href="https://www.libsdl.org/projects/SDL_ttf/">SDL2_ttf</a> is
+at your disposal. This is a library that enables you render true type fonts
+into an <code>SDL_Surface</code>, that can then be rendered in a similar fashion to what
+we&rsquo;ve done previously.</p>
+
+<p><code>--show-ports</code> tells us that the command line argument we need to pass to emcc is
+<code>-s USE_SDL_TTF=2</code> so all we need to do is add that to our command line, giving
+us&hellip;</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">write_owl.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">O2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_IMAGE</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">SDL2_IMAGE_FORMATS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;png&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> \
+    <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL2_TTF</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">write_owl.html</span>
+</pre></div>
+
+
+<p>in our code we need to remember to include the SDL_TTF header file:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;SDL/SDL_ttf.h&gt;</span>
+</pre></div>
+
+
+<p>and then we can use the SDL_TTF functions to load a true type font (that we have
+uploaded to our virtual filesystem, like our image, by placing in a preloaded
+directory) using:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">TTF_Font</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">TTF_OpenFont(</span><span style="color: #66d9ef">const</span> <span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span> <span style="color: #f8f8f2">file_path,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">ptsize)</span>
+</pre></div>
+
+
+<p>where <code>file_path</code> is the path to the true type font in the virtual filesystem, and
+<code>ptsize</code> is the size of the font.</p>
+
+<p>You can render some text to an SDL_Surface by passing the resultant TTF_Font
+pointer into the following function:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">SDL_Surface</span> <span style="color: #f92672">*</span><span style="color: #a6e22e">TTF_RenderText_Blended</span><span style="color: #f8f8f2">(TTF_Font</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">font,</span> <span style="color: #66d9ef">const</span> <span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">text,</span> <span style="color: #f8f8f2">SDL_Color</span> <span style="color: #f8f8f2">fg);</span>
+</pre></div>
+
+
+<p>where font is the TTF_Font pointer, text is a pointer to the string you want to
+render, and fg is the colour you want it rendered in. This surface is then just
+made into a texture and rendered in same way as we did for the previous owl
+image. See the soure code below for details!</p>
+
+<p>[<a href="/pages/write_owl.html">write_owl.html</a>, <a href="/code/write_owl.tar.gz">write_owl.tar.gz</a>,
+<a href="/code/write_owl.zip">write_owl.zip</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

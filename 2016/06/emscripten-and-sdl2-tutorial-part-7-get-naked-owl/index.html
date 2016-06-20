@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/">Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>We&rsquo;re so close to being able to make the perfect game you can almost taste it,
+there&rsquo;s just a few things in our way &ndash; all that &lsquo;powered by Emscripten&rsquo; gumpf
+that associates itself with or masterwork every time we get Emscripten to
+generate some HTML for us. That console might come in very useful when we were
+needing to debug things, but now we&rsquo;re convinced that our code is completely,
+absolutely, bug free and we don&rsquo;t need those crutches any more!</p>
+
+<p>The time has come to write our own HTML and say good-bye to that &lsquo;powered by
+Emscripten&rsquo; header and debug consoles forever! Or at least until we discover
+that, actually, we have got a bug&hellip;</p>
+
+<p>To do this we need to understand a little better what Emscripten is doing when
+it generates its JavaScript. A lot of it involves a
+<a href="https://kripken.github.io/emscripten-site/docs/api_reference/module.html"><code>Module</code></a>
+object, and the generated JavaScript will try and call various methods of this
+object at various points. For example whenever <code>printf</code> (or anything writing to
+the <code>stdout</code> stream) is called in C/C++ code an attempt to call the <code>Module.print</code>
+method is made and passed the text that was passed to printf. I say attempted
+because when you don&rsquo;t tell <code>emcc</code> to generate HTML the <code>Module</code> object is not
+defined and it is up to you to define it and any methods you would like to use.</p>
+
+<p>This opens up to you such exciting possibilities of defining <code>Module.print</code> to pop
+up irritating alerts containing the text, or log them to the JavaScript console,
+or append the text to a <code>&lt;div&gt;</code>&hellip; or just do nothing with it, as we&rsquo;re going to do.
+One method we are going to implement is <code>Module.canvas</code>. This is a method that
+takes no arguments and returns a function that also takes no arguments and
+returns the DOM <code>&lt;canvas&gt;</code> element that will be used as the &lsquo;window&rsquo; by our app.</p>
+
+<p>So to give the application a screen to show itself in, we need to put a <code>&lt;canvas&gt;</code>
+element into the HTML and define a <code>Module</code> object with a <code>canvas</code> method that
+returns a function returning this DOM element:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">canvas</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;canvas&quot;</span><span style="color: #f8f8f2">&gt;&lt;/</span><span style="color: #f92672">canvas</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #66d9ef">var</span> <span style="color: #a6e22e">Module</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">canvas</span><span style="color: #f92672">:</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">canvas</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">getElementById</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;canvas&#39;</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">;</span>
+        <span style="color: #f8f8f2">})()</span>
+<span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
+<p>Another thing that is essential is loading the file with the static memory via
+an XML HTTP request. This bit of JavaScript looks moderately scary, but really
+it is just defining where the file containing the static memory is (in this case
+<code>naked_owl.js.mem</code>) and making a XML HTTP request to fetch this file:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+  <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">memoryInitializer</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&#39;naked_owl.js.mem&#39;</span><span style="color: #f8f8f2">;</span>
+  <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">typeof</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;locateFile&#39;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">===</span> <span style="color: #e6db74">&#39;function&#39;</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">memoryInitializer</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;locateFile&#39;</span><span style="color: #f8f8f2">](</span><span style="color: #a6e22e">memoryInitializer</span><span style="color: #f8f8f2">);</span>
+  <span style="color: #f8f8f2">}</span> <span style="color: #66d9ef">else</span> <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;memoryInitializerPrefixURL&#39;</span><span style="color: #f8f8f2">])</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">memoryInitializer</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;memoryInitializerPrefixURL&#39;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">+</span> <span style="color: #a6e22e">memoryInitializer</span><span style="color: #f8f8f2">;</span>
+  <span style="color: #f8f8f2">}</span>
+  <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">xhr</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;memoryInitializerRequest&#39;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">XMLHttpRequest</span><span style="color: #f8f8f2">();</span>
+  <span style="color: #a6e22e">xhr</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">open</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;GET&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">memoryInitializer</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">true</span><span style="color: #f8f8f2">);</span>
+  <span style="color: #a6e22e">xhr</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">responseType</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&#39;arraybuffer&#39;</span><span style="color: #f8f8f2">;</span>
+  <span style="color: #a6e22e">xhr</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">send</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">null</span><span style="color: #f8f8f2">);</span>
+<span style="color: #f8f8f2">})();</span>
+</pre></div>
+
+
+<p>The last thing is to load the main JavaScript (<code>naked_owl.js</code>) and append it to the HTML
+document&rsquo;s body:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">script</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">createElement</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;script&#39;</span><span style="color: #f8f8f2">);</span>
+<span style="color: #a6e22e">script</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">src</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;naked_owl.js&quot;</span><span style="color: #f8f8f2">;</span>
+<span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">body</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">appendChild</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">script</span><span style="color: #f8f8f2">);</span>
+</pre></div>
+
+
+<p>That is all that is essential for getting a graphical application to run, you
+are now free to apply CSS to that page to your heart&rsquo;s content, but here are
+some bonus nuggets of knowledge&hellip;</p>
+
+<p>The <code>Module</code> object has a <code>requestFullScreen</code> method, that when invoked makes your
+application go fullscreen. This takes two boolean arguments, the first says
+whether to hide the mouse cursor or not, the second whether to keep the canvas
+at its current resolution or to expand it to fullscreen and lower the
+resolution.  Because of browser security there are some caveats to calling this,
+it will only work when called from within a user triggered event, for example
+clicking on a button. To make such a button an element something like this needs
+to be added to the document:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">p</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;fullScreenButton&quot;</span> <span style="color: #a6e22e">onclick</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;Module.requestFullScreen(true, false)&quot;</span><span style="color: #f8f8f2">&gt;</span>Click for full-screen<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">p</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
+<p>Finally, we&rsquo;ll not start the application running straight away, but add a button
+that starts the application. The <code>Module</code> object has a
+<a href="https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall"><code>ccall</code></a>
+method that can be used to call a C function from JavaScript. It takes three
+argumments, the first is a string containing the name of the function, the next
+gives the expected return type, the next is an array describing the types of the
+arguments the C function takes. By renaming our <code>main</code> function in our C
+program, say by giving it the signature:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #a6e22e">mainf</span><span style="color: #f8f8f2">();</span>
+</pre></div>
+
+
+<p>we can call it from a JavaScript function by doing something like this within
+the HTML&rsquo;s JavaScript:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">start_function</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">ccall</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;mainf&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">null</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">null</span><span style="color: #f8f8f2">);</span>
+<span style="color: #f8f8f2">};</span>
+</pre></div>
+
+
+<p>The very observant amongst you will notice that in the last couple of paragraphs
+I&rsquo;ve stopped referring to C/C++ and started referring to plain old C. The reason
+for this is that <code>ccall</code> only supports C functions, if you have a C++ project and you
+want to call a function from within JavaScript, you&rsquo;ll have to place the key
+words <code>extern &quot;C&quot;</code> before the function definition. This is because of C++ <a href="https://en.wikipedia.org/wiki/Name_mangling">name
+mangling</a>, where in C++ you can have
+two functions with the same name and Emscripten wouldn&rsquo;t know which one you are
+referring to.</p>
+
+<p>Other problems with function names can also be encountered because Emscripten
+compresses its compiled JavaScript and sometimes tampers with function names. To
+stop it doing this with functions you wish to call from JavaScript you have to
+pass the <code>-s EXPORTED_FUNCTIONS:'[&quot;_mainf&quot;]'</code> command line argument to <code>emcc</code>.
+Note the underscore before the function name, it&rsquo;s important!</p>
+
+<p>To get <code>emcc</code> to only output JavaScript, rather than HTML, change the <code>-o</code>
+argument to refer to a file with a <code>.js</code> subscript, like so:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">naked_owl.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">O2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_IMAGE</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">SDL2_IMAGE_FORMATS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;png&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_TTF</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> \
+    <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">EXPORTED_FUNCTIONS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;_mainf&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">naked_owl.js</span>
+</pre></div>
+
+
+<p>Source code implementing these ideas and a page showing their effect is included
+below:</p>
+
+<p>[<a href="/pages/naked_owl.html">naked_owl.html</a>, <a href="/code/naked_owl.tar.gz">naked_owl.tar.gz</a>,
+<a href="/code/naked_owl.zip">write_owl.zip</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

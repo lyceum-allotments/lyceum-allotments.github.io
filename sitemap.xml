@@ -3,12 +3,47 @@
   
   <url>
     <loc>http://lyceum-allotments.github.io/</loc>
-    <lastmod>2016-06-07T23:06:36+01:00</lastmod>
+    <lastmod>2016-06-19T00:00:07+01:00</lastmod>
   </url>
   
   <url>
-    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2/</loc>
-    <lastmod>2016-06-07T23:06:36+01:00</lastmod>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</loc>
+    <lastmod>2016-06-19T00:00:07+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</loc>
+    <lastmod>2016-06-19T00:00:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</loc>
+    <lastmod>2016-06-19T00:00:05+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</loc>
+    <lastmod>2016-06-19T00:00:04+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</loc>
+    <lastmod>2016-06-19T00:00:03+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</loc>
+    <lastmod>2016-06-19T00:00:02+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</loc>
+    <lastmod>2016-06-19T00:00:01+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</loc>
+    <lastmod>2016-06-19T00:00:00+01:00</lastmod>
   </url>
   
 </urlset>

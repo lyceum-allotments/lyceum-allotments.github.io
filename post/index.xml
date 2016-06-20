@@ -6,21 +6,67 @@
     <description>Recent content in Posts on The Lyceum Allotments</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jun 2016 23:06:36 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 19 Jun 2016 00:00:07 +0100</lastBuildDate>
     <atom:link href="http://lyceum-allotments.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Emscripten and SDL 2</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2/</link>
-      <pubDate>Tue, 07 Jun 2016 23:06:36 +0100</pubDate>
+      <title>Emscripten and SDL 2 Tutorial Part 1</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:07 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2/</guid>
-      <description>
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://kripken.github.io/emscripten-site/&#34;&gt;Emscripten&lt;/a&gt;
+ is a compiler that allows you to take standard C/C++ and compile it
+to JavaScript, making it possible to port your C/C++ programs and run them in
+any modern browser. This tutorial series aims to be your guide and lead you to using the
+&lt;a href=&#34;https://www.libsdl.org/&#34;&gt;SDL2&lt;/a&gt; library to implement all the basic components of a 2D game; showing an
+image, moving an image and listening for user input, and enabling you to make a
+game like this example of &amp;lsquo;snake&amp;rsquo; with relative ease in C/C++, all without
+writing a single line of JavaScript.&lt;/p&gt;
 
-&lt;h2 id=&#34;introduction-to-llvm-emscripten-and-asm-js&#34;&gt;Introduction to LLVM, Emscripten and asm.js&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/snake.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/snake_screen_shot.png&#34; alt=&#34;snake screenshot&#34;&gt;
+&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;#hellodiv&#34;&gt;hello&lt;/a&gt;
-JavaScript is a remarkable language, cobbled together in 10 days in 1995 and
+&lt;p&gt;The tutorial is broken into the following stages, that take you from an
+introduction into what Emscripten does to making a customised web-site to host
+your application:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/&#34;&gt;&lt;strong&gt;Introduction to LLVM, Emscripten and asm.js&lt;/strong&gt;&lt;/a&gt;
+&amp;ndash; a discussion of the various tools that will be used and how they work together&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Hello World&lt;/strong&gt;&lt;/a&gt;
+&amp;ndash; the Emscripten compiler is downloaded and the classic hello world program written and compiled&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;&lt;strong&gt;Look, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; the SDL2 media library is used with Emscripten to display a
+delightful image of an owl&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;&lt;strong&gt;Move, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; upping the complexity level and moving the owl depending on
+user input&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/&#34;&gt;&lt;strong&gt;Write Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; using the SDL2_TTF font rendering library to put some text
+into the scene&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/&#34;&gt;&lt;strong&gt;Get Naked, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; making some final tweaks to the presentation of our
+application&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/&#34;&gt;&lt;strong&gt;Making Something Practical&lt;/strong&gt;&lt;/a&gt;&amp;ndash; a bigger project, a game of snake, is
+discussed and issues surrounding bigger projects addressed&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I hope this tutorial&amp;rsquo;s helpful to you and wish you all the best as you dive into
+the brave new world of transpiling C/C++ into JavaScript!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 2: Introduction to LLVM, Emscripten and asm.js</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:06 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</guid>
+      <description>&lt;p&gt;JavaScript is a remarkable language, cobbled together in 10 days in 1995 and
 intended to be a forgiving language to enable simple pieces of interactivity to
 be incorporated into web pages, it now finds itself implemented in every
 graphical web-browser and the natural choice for writing client-side web-apps
@@ -29,21 +75,22 @@ that run anywhere that will run a browser.&lt;/p&gt;
 &lt;p&gt;Rather like a drunken tattoo of Baphomet acquired at a time when you&amp;rsquo;d no idea
 you would later wish to join the clergy, the issue now is how to deal with the
 consequences of this unforseeable unfortunate choice. There are multiple
-options: the first is simply to join the occult, JavaScript has its redeeming
+options. The first is simply to join the occult, JavaScript has its redeeming
 features (as, I&amp;rsquo;m sure, so does Satanism) and some espouse adopting it on
-&lt;strong&gt;both&lt;/strong&gt; the client and server side of things, node.js facilitates, this while
-MongoDB and CouchDB allow even database queries to be scripted in JavaScript.&lt;/p&gt;
+&lt;strong&gt;both&lt;/strong&gt; the client and server side of things.
+&lt;a href=&#34;https://nodejs.org/en/&#34;&gt;node.js&lt;/a&gt; facilitates this, this while
+&lt;a href=&#34;https://www.mongodb.com/&#34;&gt;MongoDB&lt;/a&gt; and &lt;a href=&#34;http://couchdb.apache.org/&#34;&gt;CouchDB&lt;/a&gt;
+allow even database queries to be scripted in JavaScript.&lt;/p&gt;
 
-&lt;div id=&#34;hellodiv&#34;&gt;
-Another option when confronted with an unwanted tattoo of a Satanic goat etched
-onto your chest (we&#39;ve all been there) is to embilish it and render it less
-offensive to whatever type of people it is normally make up the interview panel
-for vicar school, altering it so it resembles a much-missed former family pet,
+&lt;p&gt;Another option when confronted with an unwanted tattoo of a Satanic goat etched
+onto your chest (we&amp;rsquo;ve all been there) is to embilish it and render it less
+offensive to whatever type of people it is normally make up vicar school
+interview panels. Altering it so it resembles a much-missed former family pet,
 say, or a favourite Disney character. This is the path favoured by JavaScript
-libraries such as jQuery or MooTools, libraries which take JavaScript and build,
+libraries such as &lt;a href=&#34;https://jquery.com/&#34;&gt;jQuery&lt;/a&gt; or
+&lt;a href=&#34;http://mootools.net/&#34;&gt;MooTools&lt;/a&gt;, libraries which take JavaScript and build,
 using JavaScript, a better JavaScript - one with nice functional programming
-constructs and sane universal ways of accessing the DOM.
-&lt;/div&gt;
+constructs and sane universal ways of accessing the DOM.&lt;/p&gt;
 
 &lt;p&gt;There is, however, a third way to hide your ill-advised ink, this is the route
 chosen by Emscripten and the subject of this tutorial - it is simply to to cover
@@ -52,8 +99,9 @@ deal with something much more old-fashioned and acceptable, like a Fair Isle
 patterned jumper, or, as in Escripten&amp;rsquo;s case, C++.&lt;/p&gt;
 
 &lt;p&gt;Emscripten&amp;rsquo;s functionality is simple, it takes normal C or C++, and with the
-help of parts of the LLVM compiler tool-chain produces not assembler code as
-normal compilers do, but JavaScript that can run in any (modern) browser.&lt;/p&gt;
+help of parts of the &lt;a href=&#34;http://llvm.org/&#34;&gt;LLVM&lt;/a&gt; compiler tool-chain produces not
+assembler code as normal compilers do, but JavaScript that can run in any
+(modern) browser.&lt;/p&gt;
 
 &lt;p&gt;There are a number of advantages of this. Firstly, if you don&amp;rsquo;t know JavaScript
 but do know C++, you can write C++, not JavaScript. Secondly, you get to take
@@ -66,49 +114,57 @@ designed to be compiled into optimised assembler, running quicker than assembler
 any human could write, to compile C/C++ into optimised JavaScript that runs
 quicker than JavaScript any human could write.&lt;/p&gt;
 
-&lt;p&gt;This optimised subset of JavaScript is known as asm.js, a strict sub-set of
-JavaScript where the features chosen to be included are designed to be suitable
-for being aggressively optimised by JavaScript interpreters. The specific subset
-of asm.js was originally chosen and designed by Mozilla, and a highly optimised
-interpretter inplemented as part of the Firefox browser, but implementations of
-optimised asm.js interpretters are now implemented into the Chrome and Edge
-browsers.&lt;/p&gt;
+&lt;p&gt;This optimised subset of JavaScript is known as &lt;a href=&#34;http://asmjs.org/&#34;&gt;asm.js&lt;/a&gt;, a
+strict sub-set of JavaScript where the features chosen to be included are
+designed to be suitable for being aggressively optimised by JavaScript
+interpreters. The specific subset of asm.js was originally chosen and designed
+by Mozilla, and a highly optimised interpretter inplemented as part of the
+Firefox browser, but implementations of optimised asm.js interpretters are now
+implemented into the Chrome and Edge browsers.&lt;/p&gt;
 
-&lt;p&gt;[1]: Emscripten can be seen as more or less a drop-in replacement for gcc or clang,
-C/C++ files are compiled and linked into a JavaScript executable which can then
-be incorporated into a website and run in any web-browser. That it can compile
-C/C++ with few alterations means that it is suited to compiling existing
-libraries and making their functionality available in the browser with minimal
-effort. Thus, rather than writing a 2D physics engine in JavaScript, and pulling
-your hair out trying to get it to run fast enough to power your simulation of
-irritable birds before your game is beaten to market, you can simply compile an
-existing C/C++ library like Bullet and job done. As an illustration of what
-web-browsers can achieve if you only ask them nicely, some show-offs compiled
-the Unreal 3D game engine into asm.js and the results are very impressive
-indeed.&lt;/p&gt;
+&lt;p&gt;Emscripten can be seen as more or less a drop-in replacement for C compilers
+gcc or clang, C/C++ files are compiled and linked into a JavaScript executable
+which can then be incorporated into a website and run in any web-browser. That
+it can compile C/C++ with few alterations means that it is suited to compiling
+existing libraries and making their functionality available in the browser with
+minimal effort. Thus, rather than writing a 2D physics engine in JavaScript,
+and pulling your hair out trying to get it to run fast enough to power your
+simulation of irritable birds before your game is beaten to market, you can
+simply compile an existing C/C++ library like Bullet and job done. As an
+illustration of what web-browsers can achieve if you only ask them nicely, some
+show-offs compiled the &lt;a href=&#34;https://www.youtube.com/watch?v=BV32Cs_CMqo&#34;&gt;Unreal 3D&lt;/a&gt;
+game engine into asm.js and the results are very impressive indeed.&lt;/p&gt;
 
-&lt;p&gt;This tutorial series will put you on the path to becoming that impressive, using
-an Emscripten port of SDL2 to implement all the basic components of a game,
-loading and displaying an image, moving it, and listening for user input. SDL2
-was designed to be a thin layer of abstraction over a computer&amp;rsquo;s graphics,
+&lt;p&gt;This tutorial series will put you on the path to becoming that impressive,
+using an Emscripten port of SDL2 to implement all the basic components of a
+game, loading and displaying an image, moving it, and listening for user input.
+SDL2 was designed to be a thin layer of abstraction over a computer&amp;rsquo;s graphics,
 input, and audio components, and so it proves in JavaScript, the port of SDL2
 enables you to effortless, and while barely noticing it, leverage technologies
-webGL and so you can rest at ease that your application will be using the
-client&amp;rsquo;s native graphics drivers if the brower supports it.&lt;/p&gt;
+such as webGL and so you can rest at ease that your application will be using
+the client&amp;rsquo;s native graphics drivers if the brower supports it.&lt;/p&gt;
 
 &lt;p&gt;Before we start all that though we should concentrate on walking before we can
 run and start off the same way that any adventure in silicon tends to start, by
 corralling Emscripten to say &amp;lsquo;hello world&amp;rsquo;.&lt;/p&gt;
 
-&lt;h2 id=&#34;hello-world&#34;&gt;&amp;lsquo;Hello World&amp;rsquo;&lt;/h2&gt;
-
-&lt;p&gt;The Emscripten SDK containing the Emscripten compiler can be downloaded
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Part 3: Hello World&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 3: Hello World</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:05 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</guid>
+      <description>&lt;p&gt;The Emscripten SDK containing the Emscripten compiler can be downloaded
 &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html&#34;&gt;here&lt;/a&gt;.
 On Linux and MacOS some dependencies need to be installed prior to installing
 the compiler, details of these and instructions for their installation can be
 found &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html#platform-notes-installation-instructions-portable-sdk&#34;&gt;here&lt;/a&gt;
 but after those are dealt with the installlation of Emscripten itself is quite
-straightforward, if you&amp;rsquo;re using the portable SDK it&amp;rsquo;s a case of unzipping it in
+straightforward; if you&amp;rsquo;re using the portable SDK it&amp;rsquo;s a case of unzipping it in
 a convenient place, changing into the &amp;lsquo;emsdk_portable&amp;rsquo; directory and running the
 following commands which fetch the latest online tools from the web, installs
 them, and makes them active:&lt;/p&gt;
@@ -125,6 +181,619 @@ version of Emscripten:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;source&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emsdk_env.sh&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
+
+&lt;p&gt;If all this has worked as it should, you should have the Emscripten compiler,
+&lt;code&gt;emcc&lt;/code&gt;, at the file path &lt;code&gt;./emscripten/master/emcc&lt;/code&gt; in the &lt;code&gt;emsdk_portable&lt;/code&gt;
+directory you downloaded. You can add this to your system path, or just
+reference the whole path whenever you want to invoke the compiler.&lt;/p&gt;
+
+&lt;p&gt;To check that all this has proceeded as expected we need to write a short test
+program and compile it to JavaScript. The standard C implementation of the
+classic &amp;lsquo;Hello World&amp;rsquo; program will do the trick nicely:&lt;/p&gt;
+
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;hello world!&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+[&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_world.tar.gz&#34;&gt;hello_world.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_world.zip&#34;&gt;hello_world.zip&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;Compile with the Emscripten C compiler with the following command:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_world.c&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_world.html&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and you should get the files &lt;code&gt;hello_world.html&lt;/code&gt; and &lt;code&gt;hello_world.js&lt;/code&gt; appearing
+in your working directory. &lt;code&gt;hello_world.js&lt;/code&gt; is the guts of your program, the
+JavaScript that your C program has been compiled into. The &lt;code&gt;-o hello_world.html&lt;/code&gt;
+argument which was passed to &lt;code&gt;emcc&lt;/code&gt; told &lt;code&gt;emcc&lt;/code&gt; to also generate an HTML file,
+&lt;code&gt;hello_world.html&lt;/code&gt;, which interfaces with the compiled JavaScript, including the JavaScript
+in an HTML document and also defining what should be done with the C program&amp;rsquo;s
+output. It&amp;rsquo;s possible to write this yourself, but we&amp;rsquo;ll concentrate on
+other things first, for now Emscripten&amp;rsquo;s way of dealing with output is
+fine, via a &lt;code&gt;&amp;lt;textarea&amp;gt;&lt;/code&gt; element for text output and a &lt;code&gt;&amp;lt;canvas&amp;gt;&lt;/code&gt; element for
+anything graphical we&amp;rsquo;ll be doing. If you open &lt;code&gt;hello_world.html&lt;/code&gt; in your
+browser you should see the Emscripten HTML document with the words &lt;code&gt;hello
+world!&lt;/code&gt; in the text area that&amp;rsquo;s been defined to handle stdout. I warn you, it&amp;rsquo;s
+pretty spectacular.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 4: Look, Owl</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:04 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</guid>
+      <description>&lt;p&gt;Although you can do plenty of interesting things with just logic and text, to
+impress the man on the Clapham omnibus these days you generally need to do
+something graphical. To this end we&amp;rsquo;ll now write a program to load and show this
+fetching picture of an owl coughing up a pellet:&lt;/p&gt;
+
+&lt;p&gt;&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/coughing_owl.png&#34; alt=&#34;couging owl&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;Solving this problem can be broken down into two broad stages: firstly how do we
+refer to the image of an owl stored on a server&amp;rsquo;s file system when it
+will be viewed in a web-page visited from the client&amp;rsquo;s computer where
+JavaScript runs in a sandboxed environment? Secondly, even if we can access the
+image file, how do we leverage the &lt;a href=&#34;https://www.libsdl.org/&#34;&gt;SDL2&lt;/a&gt; library to
+load and display it on the screen?&lt;/p&gt;
+
+&lt;p&gt;Emscripten provides a number of ways to solve the first problem of making files
+on the server accessible to C/C++ programs when they are run on a client, we
+will look at two here. They both work in similar ways, a directory is specifed
+and the files in that directory serialised and uploaded to the client where
+Emscripten maps them to a virtual filesystem with the same layout as that of
+where you compiled the program. The difference between the two methods lays in
+where the files are serialised and how they are uploaded.&lt;/p&gt;
+
+&lt;p&gt;The first option involves embedding the files in the JavaScript itself, and the
+files are loaded with the JavaScript. By default, the files to be loaded should
+be stored in a directory nested inside the directory where you compile your
+program from. You can then tell Emscripten to embed the files inside this
+directory by passing the &lt;code&gt;--embed-file &amp;lt;directory&amp;gt;&lt;/code&gt; command-line argument to
+emcc at compilation.&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl&lt;/span&gt;
+    &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;│&lt;/span&gt;   
+    &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;├──&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl.c&lt;/span&gt;
+    &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;│&lt;/span&gt;   
+    &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;└──&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt;
+        &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;└──&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;images&lt;/span&gt;
+            &lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;└──&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;owl.png&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Take as an example this file hierarchy, if we are in the &lt;code&gt;hello_owl&lt;/code&gt; directory
+and we compile &lt;code&gt;hello_owl.c&lt;/code&gt; with the command:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;embed&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl.html&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;then the filesystem from the &lt;code&gt;assets&lt;/code&gt; directory downwards will be serialised and
+compiled into the &lt;code&gt;hello_owl.js&lt;/code&gt; JavaScript script. &lt;code&gt;hello_world.c&lt;/code&gt; could now open
+the file in the same way a native C/C++ program would by calling something like:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;FILE&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fp&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fopen(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;assets/images/owl.png&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;r&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is all well and good, but embedding files straight in the JavaScript like
+this isn&amp;rsquo;t very efficient. The problem is that everything has to be loaded in
+one go over one connection. It is better if the files are stored in a separate
+file and loaded separately via a XML HTTP request, Emscripten can then make sure
+that the compiled JavaScript only runs once this XML HTTP request has completed
+and the virtual filesystem has been set up.&lt;/p&gt;
+
+&lt;p&gt;This is achieved in a very similar way to how a filesystem is embedded, only
+this method is known as preloading the files and you would compile &lt;code&gt;hello_owl.c&lt;/code&gt;
+with the following command:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;preload&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl.html&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This would result in a file &lt;code&gt;hello_owl.data&lt;/code&gt; being produced upon compilation,
+containing the filesystem information which would then be loaded via a XML HTTP
+request on loading &lt;code&gt;hello_owl.html&lt;/code&gt;. One small caveat with this method and doing
+local testing on the Google Chrome or Microsoft Edge browsers is that these
+browsers cannot load local files via XML HTTP requests, so local testing must be
+done using a web-server as opposed to just opening &lt;code&gt;hello_owl.html&lt;/code&gt; in the browser
+(alternatively, you could just do local testing in Firefox).&lt;/p&gt;
+
+&lt;p&gt;A similar choice between embedding and preloading data occurs regarding
+statically allocated memory in the C/C++ program (memory used for static
+variables and such). In a program with a lot of local variables it becomes
+inefficient to embed this memory in the JavaScript and upload over one
+connection, in such a case it is a possible to do a thing similar to what we
+just did with preloading file assets; by passing emscripten the &lt;code&gt;--memory-init-file
+1&lt;/code&gt; command line argument emscripten will put the memory for static variables in a
+separate file (&lt;code&gt;hello_owl.html.mem&lt;/code&gt;) which is loaded via a XML HTTP request on page
+load. By telling Emscripten to use second level optimisation (the &lt;code&gt;-O2&lt;/code&gt; command
+line argument) the &lt;code&gt;memory-init-file 1&lt;/code&gt; functionality will be turned on by default,
+and that is what we will use from now on.&lt;/p&gt;
+
+&lt;p&gt;Regarding the second issue of how to access SDL2 to load an image, here we can
+make use of a number of libraries that have been ported to, and can be used from
+within, Emscripten. Using these ports is really easy, they are all hosted on
+&lt;a href=&#34;https://github.com/emscripten-ports&#34;&gt;github&lt;/a&gt;, and by passing the command line
+argument &lt;code&gt;-s&lt;/code&gt; followed by the appropriate port argument they can be accessed
+from within your code. A list of ports and their corresponding names can be acquired
+with the command:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;show&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;ports&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Doing this, we can see that Emscripten ports provides the SDL2 library and the
+SDL2_image library and these are accessible by using the arguments &lt;code&gt;-s
+USE_SDL=2&lt;/code&gt; and &lt;code&gt;-s USE_SDL_IMAGE=2&lt;/code&gt;. An additional subtlety that must be
+observed with SDL2_image is that you must pass the image formats that you wish
+SDL2_image to support, for example, to make SDL2_image support png images pass
+the command &lt;code&gt;-s SDL2_IMAGE_FORMATS=&#39;[&amp;quot;png&amp;quot;]&#39;&lt;/code&gt; at compilation.&lt;/p&gt;
+
+&lt;p&gt;Putting all this together with the previous discussion we reach the following
+compilation command for a program that can load png images from a virtual
+filesystem using the SDL2 library:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl.c&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;O2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL_IMAGE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL2_IMAGE_FORMATS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;png&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt; \
+    &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;preload&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;hello_owl.html&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now that we have the compilation command, all that remains for us to do is
+actually write the program!&lt;/p&gt;
+
+&lt;p&gt;If you&amp;rsquo;re familiar with SDL2 this step is straightforward because it&amp;rsquo;s
+identical to how you&amp;rsquo;d do it for compiling for a native machine! You can
+download the &lt;code&gt;hello_owl.c&lt;/code&gt; program source code below, it uses the SDL2_image
+function &lt;code&gt;IMG_Load&lt;/code&gt; to load an image file (loaded from the preloaded virtual file
+system) and copies that to a renderer that is then used to display the image to
+the screen using SDL2 functions.&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_owl.tar.gz&#34;&gt;hello_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_owl.zip&#34;&gt;hello_owl.zip&lt;/a&gt;]&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 5: Move, Owl</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:03 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</guid>
+      <description>&lt;p&gt;We can now use SDL2 to load and display an image. The next step is to learn how
+to move this image, and then to use SDL&amp;rsquo;s functions to listen for user input in
+order to control the movement.&lt;/p&gt;
+
+&lt;p&gt;Moving the image turns out to be one of those things that needs to be done a
+little differently to how it is normally done in native C/C++ programs. On those
+occassions you typically have a main event loop and inside that main loop you
+increment the position of the image a small amount on each iteration, something
+like this:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * Initialise SDL and open window and renderer here&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; */&lt;/span&gt;
+
+&lt;span style=&#34;color: #66d9ef&#34;&gt;bool&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;carry_on&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;true;&lt;/span&gt;
+
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Surface&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;image&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;IMG_Load(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;assets/owl.png&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Texture&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;tex&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_CreateTextureFromSurface(renderer,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;image);&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+
+&lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * Have an infinite loop...&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; */&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;while&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(carry_on)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * Clear the screen&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   */&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RenderClear(renderer);&lt;/span&gt;
+
+  &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * Create a rectangle to copy the image into, with the x&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * location of the image set to the value of the &lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * variable x that will be incremented in the loop&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   */&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Rect&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;dest&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{.x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;x,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;.y&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;100&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;.w&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;200&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;.h&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;200&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+
+  &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * Copy the image into the renderer in the new location&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * defined by dest&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   */&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RenderCopy&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(renderer,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;tex,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;NULL,&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;dest);&lt;/span&gt;
+
+  &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * Render the screen&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   */&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RenderPresent(renderer);&lt;/span&gt;
+  
+  &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * Increment x by 5 pixels, ensuring that next time we&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   * render the image it is drawn to the right 5 pixels&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;   */&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;5&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The problem of doing this in JavaScript is related to how JavaScript is run in
+the browser. The browser event model uses cooperative multitasking as a
+multitasking model, this means that each event must voluntarily give control
+back to the process scheduler which can then allow another process to run for a
+while (until that, in turn, gives control back to the process scheduler). When
+an infinite loop is implemented in the manner above the JavaScript running
+process will never give control back to the browser and so no other processes in
+your browser will be able to run (in actuality, your browser will detect this and
+offer you the chance to shut down the offending process).&lt;/p&gt;
+
+&lt;p&gt;Luckily, the Emscripten C API provides us with some functions that act like an
+infinite loop, whilst playing nice and sharing, giving control back to the
+browser periodically so that other things can be done. The one we will use here
+is &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_set_main_loop_arg&#34;&gt;&lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt;&lt;/a&gt;,
+defined in the header file &lt;code&gt;emscripten.h&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;emscripten_set_main_loop_arg(em_arg_callback_func&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;arg,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fps,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;simulate_infinite_loop)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here, &lt;code&gt;func&lt;/code&gt; is a function pointer to a function taking a void pointer as an
+argument, &lt;code&gt;arg&lt;/code&gt; is the void pointer that will be passed as an argument, &lt;code&gt;fps&lt;/code&gt; is the
+number of times per second that you wish &lt;code&gt;func&lt;/code&gt; to be called and
+the &lt;code&gt;simulate_infinite_loop&lt;/code&gt; arguement we will get to in a moment.&lt;/p&gt;
+
+&lt;p&gt;It turns out that modern browsers support a method on the &lt;code&gt;window&lt;/code&gt; DOM object
+specifically for the purposes of animation. This is
+&lt;code&gt;window.requestAnimationFrame()&lt;/code&gt; and calls a function repeatedly at the same rate
+as the browser refresh rate. If you&amp;rsquo;re using the main loop for updating graphics
+(as we will be) it is a waste of resources to update the image at a greater rate
+than the browser is refreshing. By passing an &lt;code&gt;fps&lt;/code&gt; argument to
+&lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt; equal to -1 Emscripten will use
+&lt;code&gt;requestAnimationFrame&lt;/code&gt; under the bonnet and so you will not refresh the graphics
+faster than the browser, in general, it is a good idea to do this.&lt;/p&gt;
+
+&lt;p&gt;To get out of the main loop, Emscripten provides the function
+&lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_cancel_main_loop&#34;&gt;&lt;code&gt;emscripten_cancel_main_loop&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;emscripten_cancel_main_loop(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which when called will simply stop the main loop looping. It&amp;rsquo;s important to note
+though, that the loop handler will not return.&lt;/p&gt;
+
+&lt;p&gt;Here&amp;rsquo;s a simple example using &lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt; and
+&lt;code&gt;emscripten_canel_main_loop&lt;/code&gt; to pass an integer to a loop function and increment
+it until it equals 100 at which point the looping is stopped:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * Provides emscripten_set_main_loop_arg and emscripten_cancel_main_loop&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; */&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;emscripten.h&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * A context structure that we can use for passing variables to our loop&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * function, in this case it just contains a single integer&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; */&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;context&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;x;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+
+&lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; * The loop handler, will be called repeatedly&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt; */&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;loop_fn&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;arg)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;context&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;arg;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;x: %d&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;x);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(ctx&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;100&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;         * After 101 iterations, stop looping&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;         */&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;emscripten_cancel_main_loop();&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;got here...&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;context&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx;&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;simulate_infinite_loop&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx.x&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;emscripten_set_main_loop_arg(loop_fn,&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx,&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;simulate_infinite_loop);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #75715e&#34;&gt;/**&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;     * If simulate_infinite_loop = 0, emscripten_set_main_loop_arg won&amp;#39;t block&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;     * and this code will run straight away.&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;     * If simulate_infinite_loop = 1 then this code will not be reached&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;     */&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;quitting...&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/code/loop_test.tar.gz&#34;&gt;loop_test.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/loop_test.zip&#34;&gt;loop_test.zip&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;This example can be simply altered to illustrate the effect of the
+&lt;code&gt;simulate_infinite_loop&lt;/code&gt; argument given to &lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt;. When it
+is set to 0, the call to &lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt; won&amp;rsquo;t block, code after it
+will execute simulataneously to the looping. This means that if you have
+clean-up code after your main loop has finished, you risk calling it and cleaning
+up stuff that your main loop might still need. Setting &lt;code&gt;simulate_infinite_loop&lt;/code&gt; to
+1 will prevent this from happening, and the compiled JavaScript will stop the
+execution of the caller at this point. This means that the code after the loop
+will never be reached, note that this means it won&amp;rsquo;t be reached even after
+&lt;code&gt;emscripten_cancel_main_loop&lt;/code&gt; is called!&lt;/p&gt;
+
+&lt;p&gt;With a straight-forward application of these principles we can alter our
+&lt;code&gt;hello_owl&lt;/code&gt; program so that we can listen to user input and move the owl picture
+as appropriate. All we have to do is poll the SDL event system on each loop
+iteration to check if the user has pressed any buttons and if so to react
+appropriately. Depending on what button was pressed the destination rectangle
+that the owl image is rendered into is moved.&lt;/p&gt;
+
+&lt;p&gt;An example implementing this can be seen and source-code downloaded below:&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/move_owl.html&#34;&gt;move_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/move_owl.tar.gz&#34;&gt;move_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/move_owl.zip&#34;&gt;move_owl.zip&lt;/a&gt;]&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 6: Write Owl</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:02 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</guid>
+      <description>&lt;p&gt;One final component of a game that I will cover in this tutorial is text.
+Having a look at the available Emscripten ports (&lt;code&gt;emcc --show-ports&lt;/code&gt;) will
+reveal a library called &lt;a href=&#34;https://www.libsdl.org/projects/SDL_ttf/&#34;&gt;SDL2_ttf&lt;/a&gt; is
+at your disposal. This is a library that enables you render true type fonts
+into an &lt;code&gt;SDL_Surface&lt;/code&gt;, that can then be rendered in a similar fashion to what
+we&amp;rsquo;ve done previously.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;--show-ports&lt;/code&gt; tells us that the command line argument we need to pass to emcc is
+&lt;code&gt;-s USE_SDL_TTF=2&lt;/code&gt; so all we need to do is add that to our command line, giving
+us&amp;hellip;&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;write_owl.c&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;O2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL_IMAGE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL2_IMAGE_FORMATS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;png&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt; \
+    &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL2_TTF&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;preload&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;write_owl.html&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;in our code we need to remember to include the SDL_TTF header file:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;SDL/SDL_ttf.h&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and then we can use the SDL_TTF functions to load a true type font (that we have
+uploaded to our virtual filesystem, like our image, by placing in a preloaded
+directory) using:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;TTF_Font&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;TTF_OpenFont(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;file_path,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ptsize)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;where &lt;code&gt;file_path&lt;/code&gt; is the path to the true type font in the virtual filesystem, and
+&lt;code&gt;ptsize&lt;/code&gt; is the size of the font.&lt;/p&gt;
+
+&lt;p&gt;You can render some text to an SDL_Surface by passing the resultant TTF_Font
+pointer into the following function:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Surface&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;TTF_RenderText_Blended&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(TTF_Font&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;font,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;text,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Color&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fg);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;where font is the TTF_Font pointer, text is a pointer to the string you want to
+render, and fg is the colour you want it rendered in. This surface is then just
+made into a texture and rendered in same way as we did for the previous owl
+image. See the soure code below for details!&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/write_owl.html&#34;&gt;write_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/write_owl.tar.gz&#34;&gt;write_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/write_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:01 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</guid>
+      <description>&lt;p&gt;We&amp;rsquo;re so close to being able to make the perfect game you can almost taste it,
+there&amp;rsquo;s just a few things in our way &amp;ndash; all that &amp;lsquo;powered by Emscripten&amp;rsquo; gumpf
+that associates itself with or masterwork every time we get Emscripten to
+generate some HTML for us. That console might come in very useful when we were
+needing to debug things, but now we&amp;rsquo;re convinced that our code is completely,
+absolutely, bug free and we don&amp;rsquo;t need those crutches any more!&lt;/p&gt;
+
+&lt;p&gt;The time has come to write our own HTML and say good-bye to that &amp;lsquo;powered by
+Emscripten&amp;rsquo; header and debug consoles forever! Or at least until we discover
+that, actually, we have got a bug&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;To do this we need to understand a little better what Emscripten is doing when
+it generates its JavaScript. A lot of it involves a
+&lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/module.html&#34;&gt;&lt;code&gt;Module&lt;/code&gt;&lt;/a&gt;
+object, and the generated JavaScript will try and call various methods of this
+object at various points. For example whenever &lt;code&gt;printf&lt;/code&gt; (or anything writing to
+the &lt;code&gt;stdout&lt;/code&gt; stream) is called in C/C++ code an attempt to call the &lt;code&gt;Module.print&lt;/code&gt;
+method is made and passed the text that was passed to printf. I say attempted
+because when you don&amp;rsquo;t tell &lt;code&gt;emcc&lt;/code&gt; to generate HTML the &lt;code&gt;Module&lt;/code&gt; object is not
+defined and it is up to you to define it and any methods you would like to use.&lt;/p&gt;
+
+&lt;p&gt;This opens up to you such exciting possibilities of defining &lt;code&gt;Module.print&lt;/code&gt; to pop
+up irritating alerts containing the text, or log them to the JavaScript console,
+or append the text to a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;&amp;hellip; or just do nothing with it, as we&amp;rsquo;re going to do.
+One method we are going to implement is &lt;code&gt;Module.canvas&lt;/code&gt;. This is a method that
+takes no arguments and returns a function that also takes no arguments and
+returns the DOM &lt;code&gt;&amp;lt;canvas&amp;gt;&lt;/code&gt; element that will be used as the &amp;lsquo;window&amp;rsquo; by our app.&lt;/p&gt;
+
+&lt;p&gt;So to give the application a screen to show itself in, we need to put a &lt;code&gt;&amp;lt;canvas&amp;gt;&lt;/code&gt;
+element into the HTML and define a &lt;code&gt;Module&lt;/code&gt; object with a &lt;code&gt;canvas&lt;/code&gt; method that
+returns a function returning this DOM element:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;canvas&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;canvas&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;text/javascript&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;getElementById&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;canvas&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;})()&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Another thing that is essential is loading the file with the static memory via
+an XML HTTP request. This bit of JavaScript looks moderately scary, but really
+it is just defining where the file containing the static memory is (in this case
+&lt;code&gt;naked_owl.js.mem&lt;/code&gt;) and making a XML HTTP request to fetch this file:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;naked_owl.js.mem&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;typeof&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;locateFile&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;===&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;function&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;locateFile&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;](&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;memoryInitializerPrefixURL&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;])&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;memoryInitializerPrefixURL&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;xhr&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;memoryInitializerRequest&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;XMLHttpRequest&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;();&lt;/span&gt;
+  &lt;span style=&#34;color: #a6e22e&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;open&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;GET&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;memoryInitializer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+  &lt;span style=&#34;color: #a6e22e&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;responseType&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;arraybuffer&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #a6e22e&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;send&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;})();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The last thing is to load the main JavaScript (&lt;code&gt;naked_owl.js&lt;/code&gt;) and append it to the HTML
+document&amp;rsquo;s body:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;createElement&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;script&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;src&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;naked_owl.js&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;body&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;appendChild&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That is all that is essential for getting a graphical application to run, you
+are now free to apply CSS to that page to your heart&amp;rsquo;s content, but here are
+some bonus nuggets of knowledge&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Module&lt;/code&gt; object has a &lt;code&gt;requestFullScreen&lt;/code&gt; method, that when invoked makes your
+application go fullscreen. This takes two boolean arguments, the first says
+whether to hide the mouse cursor or not, the second whether to keep the canvas
+at its current resolution or to expand it to fullscreen and lower the
+resolution.  Because of browser security there are some caveats to calling this,
+it will only work when called from within a user triggered event, for example
+clicking on a button. To make such a button an element something like this needs
+to be added to the document:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;p&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;fullScreenButton&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;onclick&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;Module.requestFullScreen(true, false)&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;Click for full-screen&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;p&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally, we&amp;rsquo;ll not start the application running straight away, but add a button
+that starts the application. The &lt;code&gt;Module&lt;/code&gt; object has a
+&lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall&#34;&gt;&lt;code&gt;ccall&lt;/code&gt;&lt;/a&gt;
+method that can be used to call a C function from JavaScript. It takes three
+argumments, the first is a string containing the name of the function, the next
+gives the expected return type, the next is an array describing the types of the
+arguments the C function takes. By renaming our &lt;code&gt;main&lt;/code&gt; function in our C
+program, say by giving it the signature:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;mainf&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;we can call it from a JavaScript function by doing something like this within
+the HTML&amp;rsquo;s JavaScript:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;start_function&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ccall&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;mainf&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The very observant amongst you will notice that in the last couple of paragraphs
+I&amp;rsquo;ve stopped referring to C/C++ and started referring to plain old C. The reason
+for this is that &lt;code&gt;ccall&lt;/code&gt; only supports C functions, if you have a C++ project and you
+want to call a function from within JavaScript, you&amp;rsquo;ll have to place the key
+words &lt;code&gt;extern &amp;quot;C&amp;quot;&lt;/code&gt; before the function definition. This is because of C++ &lt;a href=&#34;https://en.wikipedia.org/wiki/Name_mangling&#34;&gt;name
+mangling&lt;/a&gt;, where in C++ you can have
+two functions with the same name and Emscripten wouldn&amp;rsquo;t know which one you are
+referring to.&lt;/p&gt;
+
+&lt;p&gt;Other problems with function names can also be encountered because Emscripten
+compresses its compiled JavaScript and sometimes tampers with function names. To
+stop it doing this with functions you wish to call from JavaScript you have to
+pass the &lt;code&gt;-s EXPORTED_FUNCTIONS:&#39;[&amp;quot;_mainf&amp;quot;]&#39;&lt;/code&gt; command line argument to &lt;code&gt;emcc&lt;/code&gt;.
+Note the underscore before the function name, it&amp;rsquo;s important!&lt;/p&gt;
+
+&lt;p&gt;To get &lt;code&gt;emcc&lt;/code&gt; to only output JavaScript, rather than HTML, change the &lt;code&gt;-o&lt;/code&gt;
+argument to refer to a file with a &lt;code&gt;.js&lt;/code&gt; subscript, like so:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;emcc&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;naked_owl.c&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;O2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL_IMAGE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL2_IMAGE_FORMATS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;png&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;USE_SDL_TTF&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt; \
+    &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;EXPORTED_FUNCTIONS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;_mainf&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color: #960050; background-color: #1e0010&#34;&gt;&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;--&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;preload&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;file&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;assets&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;naked_owl.js&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Source code implementing these ideas and a page showing their effect is included
+below:&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/naked_owl.html&#34;&gt;naked_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/naked_owl.tar.gz&#34;&gt;naked_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/naked_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Emscripten and SDL2 Tutorial Part 8: Making Something Practical</title>
+      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</link>
+      <pubDate>Sun, 19 Jun 2016 00:00:00 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</guid>
+      <description>&lt;p&gt;At long last we&amp;rsquo;ve reached a position where we can make a 2D game that is
+something like fully functional. As an illustration I&amp;rsquo;ve made a simple version
+of Snake, which can act as a guide for any projects that you&amp;rsquo;d like to do.&lt;/p&gt;
+
+&lt;p&gt;It doesn&amp;rsquo;t really cover anything conceptually new that we haven&amp;rsquo;t covered
+before, there&amp;rsquo;s just more of it, with multiple source files to be compiled. One
+problem that will be encountered if you just try and compile it using the
+previous command is that when you try and run the program you&amp;rsquo;ll be told that
+you&amp;rsquo;ve run out of memory.&lt;/p&gt;
+
+&lt;p&gt;For dynamic memory, Emscripten declares a JavaScript typed array and passes
+&amp;lsquo;pointers&amp;rsquo; to that whenever the program requests some dynamic memory. To deal
+with a memory problem we simply need to make this typed array larger. By passing
+the command line argument &lt;code&gt;-s TOTAL_MEMORY=67108864&lt;/code&gt; to &lt;code&gt;emcc&lt;/code&gt; a typed array of
+size 67108864 bytes (that is, 2^26 bytes) will be used, which should be enough.&lt;/p&gt;
+
+&lt;p&gt;If you&amp;rsquo;re not sure how much memory your program is going to use it is possible
+to pass the &lt;code&gt;emcc&lt;/code&gt; command line argument &lt;code&gt;-s ALLOW_MEMORY_GROWTH=1&lt;/code&gt; which allows
+the memory array to grow if needs be, but this involves a performance cost.&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/snake.html&#34;&gt;snake.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/snake.tar.gz&#34;&gt;snake.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/snake.zip&#34;&gt;snake.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     

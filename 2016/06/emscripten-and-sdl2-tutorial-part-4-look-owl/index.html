@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL2 Tutorial Part 4: Look, Owl</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/">Emscripten and SDL2 Tutorial Part 4: Look, Owl</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>Although you can do plenty of interesting things with just logic and text, to
+impress the man on the Clapham omnibus these days you generally need to do
+something graphical. To this end we&rsquo;ll now write a program to load and show this
+fetching picture of an owl coughing up a pellet:</p>
+
+<p><img style="display:block;margin-left:auto;margin-right:auto" src="/images/coughing_owl.png" alt="couging owl"></p>
+
+<p>Solving this problem can be broken down into two broad stages: firstly how do we
+refer to the image of an owl stored on a server&rsquo;s file system when it
+will be viewed in a web-page visited from the client&rsquo;s computer where
+JavaScript runs in a sandboxed environment? Secondly, even if we can access the
+image file, how do we leverage the <a href="https://www.libsdl.org/">SDL2</a> library to
+load and display it on the screen?</p>
+
+<p>Emscripten provides a number of ways to solve the first problem of making files
+on the server accessible to C/C++ programs when they are run on a client, we
+will look at two here. They both work in similar ways, a directory is specifed
+and the files in that directory serialised and uploaded to the client where
+Emscripten maps them to a virtual filesystem with the same layout as that of
+where you compiled the program. The difference between the two methods lays in
+where the files are serialised and how they are uploaded.</p>
+
+<p>The first option involves embedding the files in the JavaScript itself, and the
+files are loaded with the JavaScript. By default, the files to be loaded should
+be stored in a directory nested inside the directory where you compile your
+program from. You can then tell Emscripten to embed the files inside this
+directory by passing the <code>--embed-file &lt;directory&gt;</code> command-line argument to
+emcc at compilation.</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>    <span style="color: #f8f8f2">hello_owl</span>
+    <span style="color: #960050; background-color: #1e0010">│</span>   
+    <span style="color: #960050; background-color: #1e0010">├──</span> <span style="color: #f8f8f2">hello_owl.c</span>
+    <span style="color: #960050; background-color: #1e0010">│</span>   
+    <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">assets</span>
+        <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">images</span>
+            <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">owl.png</span>
+</pre></div>
+
+
+<p>Take as an example this file hierarchy, if we are in the <code>hello_owl</code> directory
+and we compile <code>hello_owl.c</code> with the command:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">embed</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
+</pre></div>
+
+
+<p>then the filesystem from the <code>assets</code> directory downwards will be serialised and
+compiled into the <code>hello_owl.js</code> JavaScript script. <code>hello_world.c</code> could now open
+the file in the same way a native C/C++ program would by calling something like:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">FILE</span> <span style="color: #f92672">*</span> <span style="color: #f8f8f2">fp</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">fopen(</span><span style="color: #e6db74">&quot;assets/images/owl.png&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">);</span>
+</pre></div>
+
+
+<p>This is all well and good, but embedding files straight in the JavaScript like
+this isn&rsquo;t very efficient. The problem is that everything has to be loaded in
+one go over one connection. It is better if the files are stored in a separate
+file and loaded separately via a XML HTTP request, Emscripten can then make sure
+that the compiled JavaScript only runs once this XML HTTP request has completed
+and the virtual filesystem has been set up.</p>
+
+<p>This is achieved in a very similar way to how a filesystem is embedded, only
+this method is known as preloading the files and you would compile <code>hello_owl.c</code>
+with the following command:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
+</pre></div>
+
+
+<p>This would result in a file <code>hello_owl.data</code> being produced upon compilation,
+containing the filesystem information which would then be loaded via a XML HTTP
+request on loading <code>hello_owl.html</code>. One small caveat with this method and doing
+local testing on the Google Chrome or Microsoft Edge browsers is that these
+browsers cannot load local files via XML HTTP requests, so local testing must be
+done using a web-server as opposed to just opening <code>hello_owl.html</code> in the browser
+(alternatively, you could just do local testing in Firefox).</p>
+
+<p>A similar choice between embedding and preloading data occurs regarding
+statically allocated memory in the C/C++ program (memory used for static
+variables and such). In a program with a lot of local variables it becomes
+inefficient to embed this memory in the JavaScript and upload over one
+connection, in such a case it is a possible to do a thing similar to what we
+just did with preloading file assets; by passing emscripten the <code>--memory-init-file
+1</code> command line argument emscripten will put the memory for static variables in a
+separate file (<code>hello_owl.html.mem</code>) which is loaded via a XML HTTP request on page
+load. By telling Emscripten to use second level optimisation (the <code>-O2</code> command
+line argument) the <code>memory-init-file 1</code> functionality will be turned on by default,
+and that is what we will use from now on.</p>
+
+<p>Regarding the second issue of how to access SDL2 to load an image, here we can
+make use of a number of libraries that have been ported to, and can be used from
+within, Emscripten. Using these ports is really easy, they are all hosted on
+<a href="https://github.com/emscripten-ports">github</a>, and by passing the command line
+argument <code>-s</code> followed by the appropriate port argument they can be accessed
+from within your code. A list of ports and their corresponding names can be acquired
+with the command:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">show</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">ports</span>
+</pre></div>
+
+
+<p>Doing this, we can see that Emscripten ports provides the SDL2 library and the
+SDL2_image library and these are accessible by using the arguments <code>-s
+USE_SDL=2</code> and <code>-s USE_SDL_IMAGE=2</code>. An additional subtlety that must be
+observed with SDL2_image is that you must pass the image formats that you wish
+SDL2_image to support, for example, to make SDL2_image support png images pass
+the command <code>-s SDL2_IMAGE_FORMATS='[&quot;png&quot;]'</code> at compilation.</p>
+
+<p>Putting all this together with the previous discussion we reach the following
+compilation command for a program that can load png images from a virtual
+filesystem using the SDL2 library:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">hello_owl.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">O2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_IMAGE</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">SDL2_IMAGE_FORMATS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;png&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> \
+    <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
+</pre></div>
+
+
+<p>Now that we have the compilation command, all that remains for us to do is
+actually write the program!</p>
+
+<p>If you&rsquo;re familiar with SDL2 this step is straightforward because it&rsquo;s
+identical to how you&rsquo;d do it for compiling for a native machine! You can
+download the <code>hello_owl.c</code> program source code below, it uses the SDL2_image
+function <code>IMG_Load</code> to load an image file (loaded from the preloaded virtual file
+system) and copies that to a renderer that is then used to display the image to
+the screen using SDL2 functions.</p>
+
+<p>[<a href="/code/hello_owl.tar.gz">hello_owl.tar.gz</a>,
+<a href="/code/hello_owl.zip">hello_owl.zip</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

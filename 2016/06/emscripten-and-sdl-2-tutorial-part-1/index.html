@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten and SDL 2 Tutorial Part 1</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/emscripten_tutorial.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/">Emscripten and SDL 2 Tutorial Part 1</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p><a href="https://kripken.github.io/emscripten-site/">Emscripten</a>
+ is a compiler that allows you to take standard C/C++ and compile it
+to JavaScript, making it possible to port your C/C++ programs and run them in
+any modern browser. This tutorial series aims to be your guide and lead you to using the
+<a href="https://www.libsdl.org/">SDL2</a> library to implement all the basic components of a 2D game; showing an
+image, moving an image and listening for user input, and enabling you to make a
+game like this example of &lsquo;snake&rsquo; with relative ease in C/C++, all without
+writing a single line of JavaScript.</p>
+
+<p><a href="/pages/snake.html">
+<img style="display:block;margin-left:auto;margin-right:auto" src="/images/snake_screen_shot.png" alt="snake screenshot">
+</a></p>
+
+<p>The tutorial is broken into the following stages, that take you from an
+introduction into what Emscripten does to making a customised web-site to host
+your application:</p>
+
+<ul>
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/"><strong>Introduction to LLVM, Emscripten and asm.js</strong></a>
+&ndash; a discussion of the various tools that will be used and how they work together</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/"><strong>Hello World</strong></a>
+&ndash; the Emscripten compiler is downloaded and the classic hello world program written and compiled</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/"><strong>Look, Owl</strong></a> &ndash; the SDL2 media library is used with Emscripten to display a
+delightful image of an owl</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/"><strong>Move, Owl</strong></a> &ndash; upping the complexity level and moving the owl depending on
+user input</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/"><strong>Write Owl</strong></a> &ndash; using the SDL2_TTF font rendering library to put some text
+into the scene</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/"><strong>Get Naked, Owl</strong></a> &ndash; making some final tweaks to the presentation of our
+application</p></li>
+
+<li><p><a href="/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/"><strong>Making Something Practical</strong></a>&ndash; a bigger project, a game of snake, is
+discussed and issues surrounding bigger projects addressed</p></li>
+</ul>
+
+<p>I hope this tutorial&rsquo;s helpful to you and wish you all the best as you dive into
+the brave new world of transpiling C/C++ into JavaScript!</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

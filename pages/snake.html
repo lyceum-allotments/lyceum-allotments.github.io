@@ -43,9 +43,9 @@
 
     <script type='text/javascript'>
         var Module = {
-            preRun: (function() {
-                document.getElementById('loadingDiv').style.visibility = "hidden";
-            })(),
+            onRuntimeInitialized: function() { 
+                document.getElementById('loadingDiv').style.visibility = 'hidden';
+            },
             canvas: (function() {
                 var canvas = document.getElementById('canvas');
                 return canvas;

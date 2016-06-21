@@ -22,6 +22,10 @@
         padding: 10px;
         cursor: default;
     }
+
+    #loadingDiv {
+        text-align: center;
+    }
 </style>
     </head>
 
@@ -29,6 +33,7 @@
         <div style="width:800px; margin-left:auto; margin-right:auto">
         <img src="snake_assets/logo.png">
         </div>
+        <div id="loadingDiv">Loading, please wait... </div>
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
       <div style="width:200px; margin-left:auto; margin-right:auto">
       <p id="fullScreenButton" onclick="Module.requestFullScreen(true, false)">Click for full-screen</p>
@@ -38,6 +43,9 @@
 
     <script type='text/javascript'>
         var Module = {
+            preRun: (function() {
+                document.getElementById('loadingDiv').style.visibility = "hidden";
+            })(),
             canvas: (function() {
                 var canvas = document.getElementById('canvas');
                 return canvas;

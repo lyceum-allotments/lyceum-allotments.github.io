@@ -169,6 +169,32 @@ to be added to the document:</p>
 </pre></div>
 
 
+<p>Another thing that can come in handy for impatient users is the display of a
+loading screen. This can be achieved by putting some loading message or image on your HTML
+page and then making it hidden when the Emscripten application is all loaded and
+ready to go. When the application is all ready it calls the
+<code>Module.onRuntimeInitialized()</code> call-back, so by providing this call-back as a
+function that hides the loading message or image, the effect can be achieved of a
+loading message that disappears when the game has loaded. This would make our
+<code>Module</code> object look something like this:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">canvas</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;canvas&quot;</span><span style="color: #f8f8f2">&gt;&lt;/</span><span style="color: #f92672">canvas</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">div</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;loadingDiv&quot;</span><span style="color: #f8f8f2">&gt;</span>The owl is loading....<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">div</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #66d9ef">var</span> <span style="color: #a6e22e">Module</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">onRuntimeInitialized</span><span style="color: #f92672">:</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">e</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">getElementById</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;loadingDiv&#39;</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #a6e22e">e</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">style</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">visibility</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&#39;hidden&#39;</span><span style="color: #f8f8f2">;</span>
+         <span style="color: #f8f8f2">},</span>
+    <span style="color: #a6e22e">canvas</span><span style="color: #f92672">:</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">canvas</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">getElementById</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;canvas&#39;</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">;</span>
+        <span style="color: #f8f8f2">})()</span>
+<span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
 <p>Finally, we&rsquo;ll not start the application running straight away, but add a button
 that starts the application. The <code>Module</code> object has a
 <a href="https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall"><code>ccall</code></a>

@@ -67,6 +67,31 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/">Emscripten Image Viewer</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			Recently I&rsquo;ve ben playing around with developing a zoomable and panning image viewer using Emscripten and its proved to be a good exercise in accessing parts of the page&rsquo;s HTML document outside of the Emscripten run-time. The end goal is to provide a JavaScript API to an image viewer, consisting of an ImgViewer object and a single method: ImgViewer(image, canvas) &ndash; sets up the viewer to use the HTMLCanvasElement, canvas and show a pannable and zoomable copy of the HTMLImageElement, image ImgViewer.changeImage(image) &ndash; changes the image shown by the image viewer to the HTMLImageElement, image The main bit of ground here that I didn&rsquo;t cover in my previous tutorial on Emscripten and SDL2, is how to somehow get the image data from the HTMLImageElement to be accessible from the Emscripten compiled C program.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Aug 03, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
 		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/">Emscripten and SDL 2 Tutorial Part 1</a>
 	</div>
 </div>
@@ -125,31 +150,6 @@ ga('send', 'pageview');
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
 			The Emscripten SDK containing the Emscripten compiler can be downloaded here. On Linux and MacOS some dependencies need to be installed prior to installing the compiler, details of these and instructions for their installation can be found here but after those are dealt with the installlation of Emscripten itself is quite straightforward; if you&rsquo;re using the portable SDK it&rsquo;s a case of unzipping it in a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and running the following commands which fetch the latest online tools from the web, installs them, and makes them active: ./emsdk update ./emsdk install latest ./emsdk activate latest Linux and MacOS X require a further step to set the system path to the active version of Emscripten: source ./emsdk_env.sh If all this has worked as it should, you should have the Emscripten compiler, emcc, at the file path ./emscripten/master/emcc in the emsdk_portable directory you downloaded.
-		</p>
-	</div>
-</div>
-<div class="row">
-	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
-	</div>
-	<div class="three columns">
-		<span style="font-size:small;">
-			
-		</span>
-	</div>
-</div>
-<br>
-
-<div class="row">
-	<div class="twelve column">
-		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/">Emscripten and SDL2 Tutorial Part 4: Look, Owl</a>
-	</div>
-</div>
-
-<div class="row">
-	<div class="twelve columns">
-		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Although you can do plenty of interesting things with just logic and text, to impress the man on the Clapham omnibus these days you generally need to do something graphical. To this end we&rsquo;ll now write a program to load and show this fetching picture of an owl coughing up a pellet: Solving this problem can be broken down into two broad stages: firstly how do we refer to the image of an owl stored on a server&rsquo;s file system when it will be viewed in a web-page visited from the client&rsquo;s computer where JavaScript runs in a sandboxed environment?
 		</p>
 	</div>
 </div>

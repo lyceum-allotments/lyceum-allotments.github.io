@@ -1,0 +1,30 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type='text/javascript' src='img_viewer.js'></script>
+    <script type='text/javascript'>
+        var setup_viewer = function(image) {
+            var canvas = document.getElementById('canvas');
+            viewer = ImgViewer(image, canvas);
+        };
+
+        var setup_viewer2 = function(image) {
+            viewer2 = ImgViewer(image, document.getElementById('secondCanvas'));
+        };
+    </script>
+    </head>
+    <body>
+
+    <div>
+        <img src="static/owl.png" onLoad="setup_viewer(this)" onClick="viewer.changeImage(this)"/>
+        <img src="static/cat.png" onClick="viewer.changeImage(this)"/>
+        <canvas id="canvas"></canvas>
+    </div>
+    <div>
+        <img src="static/robot_bird.png" onLoad="setup_viewer2(this)" onClick="viewer2.changeImage(this)"/>
+        <img src="static/intellectual.png" onClick="viewer2.changeImage(this)"/>
+        <canvas id="secondCanvas"></canvas>
+    </div>
+    </body>
+</html>

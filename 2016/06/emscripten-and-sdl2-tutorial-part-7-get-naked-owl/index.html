@@ -195,14 +195,16 @@ loading message that disappears when the game has loaded. This would make our
 </pre></div>
 
 
-<p>Finally, we&rsquo;ll not start the application running straight away, but add a button
+<p><span id="ccall_section">
+Finally, we&rsquo;ll not start the application running straight away, but add a button
 that starts the application. The <code>Module</code> object has a
 <a href="https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall"><code>ccall</code></a>
 method that can be used to call a C function from JavaScript. It takes three
 argumments, the first is a string containing the name of the function, the next
 gives the expected return type, the next is an array describing the types of the
 arguments the C function takes. By renaming our <code>main</code> function in our C
-program, say by giving it the signature:</p>
+program, say by giving it the signature:
+</span></p>
 
 <div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #a6e22e">mainf</span><span style="color: #f8f8f2">();</span>
 </pre></div>

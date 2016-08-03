@@ -6,8 +6,545 @@
     <description>Recent content on The Lyceum Allotments</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 19 Jun 2016 00:00:07 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 03 Aug 2016 10:14:48 +0100</lastBuildDate>
     <atom:link href="http://lyceum-allotments.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Emscripten Image Viewer</title>
+      <link>http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</link>
+      <pubDate>Wed, 03 Aug 2016 10:14:48 +0100</pubDate>
+      
+      <guid>http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</guid>
+      <description>
+
+&lt;p&gt;Recently I&amp;rsquo;ve ben playing around with developing a zoomable and panning
+image viewer using Emscripten and its proved to be a good exercise in accessing
+parts of the page&amp;rsquo;s HTML document outside of the Emscripten run-time.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The end goal is to provide a JavaScript API to an image viewer, consisting of an
+&lt;code&gt;ImgViewer&lt;/code&gt; object and a single method:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ImgViewer(image, canvas)&lt;/code&gt; &amp;ndash; sets up the viewer to use the
+&lt;code&gt;HTMLCanvasElement&lt;/code&gt;, &lt;code&gt;canvas&lt;/code&gt; and show a pannable and zoomable copy of the
+&lt;code&gt;HTMLImageElement&lt;/code&gt;, &lt;code&gt;image&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ImgViewer.changeImage(image)&lt;/code&gt; &amp;ndash; changes the image shown by the image viewer to the
+&lt;code&gt;HTMLImageElement&lt;/code&gt;, &lt;code&gt;image&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The main bit of ground here that I didn&amp;rsquo;t cover in my previous
+&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/&#34;&gt;tutorial on Emscripten and SDL2&lt;/a&gt;,
+is how to somehow get the image data from the &lt;code&gt;HTMLImageElement&lt;/code&gt; to be
+accessible from the Emscripten compiled C program.&lt;/p&gt;
+
+&lt;p&gt;Previously, images were loaded using Emscripten&amp;rsquo;s concept of a virtual
+filesystem, where assets are &amp;lsquo;preloaded&amp;rsquo; with an XML HTTP request. This is very
+good for keeping changes down to a minimum when porting desktop applications to
+run in the browser, but it can be equally useful to access parts of the HTML
+document from within an Emscripten compiled C program. In this post, the image
+data from an &lt;code&gt;HTMLImageElement&lt;/code&gt; will be accessed and used within SDL2 to make a
+zoomable and panning image viewer, but the concepts explored here could be used
+for any number of applications, using the speed of JavaScript produced Emscripten
+to do client-side image processing is one example.&lt;/p&gt;
+
+&lt;h2 id=&#34;what-c-wants&#34;&gt;What C Wants&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s tackle this problem from the C side of things back, outwards, to what we
+need to do in JavaScript. What our C program will require is a pointer to the
+chunk of memory containing the image data we wish to show in our image viewer
+(along with how many bytes make up the image data). Once we have this, SDL has
+the concept of a &lt;a href=&#34;https://wiki.libsdl.org/SDL_RWops&#34;&gt;&lt;code&gt;SDL_RWops&lt;/code&gt;&lt;/a&gt; structure, to
+provide a common interface for reading from all sorts of stream devices. Using
+the function&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RWops&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;SDL_RWFromConstMem&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;mem,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;size);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;can create a &lt;code&gt;SDL_RWops&lt;/code&gt; from a pointer to some constant memory.&lt;/p&gt;
+
+&lt;p&gt;This can then be passed to the SDL_image function,
+&lt;a href=&#34;http://jcatki.no-ip.org:8080/SDL_image/SDL_image.html#SEC12&#34;&gt;&lt;code&gt;IMG_Load_RW&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Surface&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;IMG_Load_RW&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(SDL_RWops&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;src,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;freesrc);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which reads the memory referred to by &lt;code&gt;SDL_RWops&lt;/code&gt; and gives us a SDL_Surface
+pointer that we can turn into a texture and render in the
+&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;usual way&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span id=&#34;load_image_section&#34;&gt;
+In code, the C function for changing the image will look something like this:
+&lt;/span&gt;&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;context&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Renderer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;renderer;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Texture&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;img_tex;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;context&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx;&lt;/span&gt;
+
+&lt;span style=&#34;color: #75715e&#34;&gt;// Set up renderer in context before calling this function&lt;/span&gt;
+
+&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;load_image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;image_data,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;size)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RWops&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_RWFromConstMem(image_data,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;size);&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_Surface&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;image&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;IMG_Load_RW(a,&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;ctx.img_tex&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_CreateTextureFromSurface(ctx.renderer,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;image);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;SDL_FreeSurface(image);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2 id=&#34;providing-what-c-wants&#34;&gt;Providing What C Wants&lt;/h2&gt;
+
+&lt;p&gt;We&amp;rsquo;ve a long way to go yet though. The next step is to be able to call the C
+function from JavaScript, passing it a pointer to some &amp;lsquo;memory&amp;rsquo; we&amp;rsquo;ve previously
+written to in JavaScript. I&amp;rsquo;ve put &amp;lsquo;memory&amp;rsquo; in inverted commas because
+JavaScript isn&amp;rsquo;t the sort of language that goes around just handing out access
+to raw memory. I&amp;rsquo;ve alluded in the past to how Emscripten provides C programs
+with the illusion of memory through
+&lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays&#34;&gt;typed arrays&lt;/a&gt;
+&amp;ndash; similar in interface to a JavaScript
+&lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array&#34;&gt;&lt;code&gt;Array&lt;/code&gt;&lt;/a&gt;
+but containing elements all of same type. In the same way that C programs can cast
+a &lt;code&gt;char *&lt;/code&gt; to an &lt;code&gt;int *&lt;/code&gt; and by doing so change what data-type the array is
+treated as, JavaScript has the concept of a &amp;lsquo;view&amp;rsquo; of an array buffer;
+&lt;code&gt;var ta = Uint8Array(buffer)&lt;/code&gt; will view the array buffer &lt;code&gt;buffer&lt;/code&gt; as an array of
+unsigned 8 bit integers, &lt;code&gt;var tb = Uint32Array(buffer)&lt;/code&gt; will access the same
+data as an array of unsigned 32 bit integers.&lt;/p&gt;
+
+&lt;p&gt;As an illustration,
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;ta&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Uint8Array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;([&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ta&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// prints 1&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;tb&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Uint32Array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ta&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;buffer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;tb&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// prints 16777729 (1 + 2 * 2^8 + 0 * 2^16 + 1 * 2^24)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Which is broadly similar to doing the following in C:
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;uint8_t&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ta[]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;%u&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ta[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// prints 1&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;uint32_t&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;tb&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;uint32_t&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)ta;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;%u&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;tb[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// prints 16777729&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Typed arrays can be passed C side by the Emscripten provided JavaScript
+functions &lt;code&gt;ccall&lt;/code&gt; and &lt;code&gt;cwrap&lt;/code&gt;. I&amp;rsquo;ve discussed &lt;code&gt;ccall&lt;/code&gt;
+&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/#ccall_section&#34;&gt;before&lt;/a&gt;,
+&lt;code&gt;cwrap&lt;/code&gt; is similar, but returns a JavaScript function that can be used for calling
+the &amp;lsquo;wrapped&amp;rsquo; C function rather than calling it directly. If a C function
+&lt;code&gt;void print_array(void *a)&lt;/code&gt; has been exported when Emscripten was compiled, a
+function, &lt;code&gt;print_array_js&lt;/code&gt; taking a typed array as an argument can be created
+like so:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;print_array_js&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;cwrap&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;print_array&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;NULL&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;array&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Putting all these concepts together let&amp;rsquo;s show how you&amp;rsquo;d create an array of
+unsigned 8-bit integers in JavaScript and print them in the C program.&lt;/p&gt;
+
+&lt;p&gt;The guts of the HTML document will be:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;textarea&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;output&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;textarea&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;text/javascript&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// when Emscripten run-time loads, will be overwritten&lt;/span&gt;
+                             &lt;span style=&#34;color: #75715e&#34;&gt;// by function wrapper over a C print_array function&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// Creates a typed array and passes this to C function for printing&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;start_function&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Uint8Array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;([&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;4&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;6&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;8&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;onRuntimeInitialized&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color: #75715e&#34;&gt;// On load of Emscripten run-time, wrap the print_array C function and&lt;/span&gt;
+                &lt;span style=&#34;color: #75715e&#34;&gt;// call &amp;#39;start_function&amp;#39; to get us underway&lt;/span&gt;
+                &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;cwrap&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;print_array&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;array&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+                &lt;span style=&#34;color: #a6e22e&#34;&gt;start_function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;();&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;},&lt;/span&gt; 
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;t&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;element&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;getElementById&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;output&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+                &lt;span style=&#34;color: #a6e22e&#34;&gt;element&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;value&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;t&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;},&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;while the C program will look like:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;stdint.h&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;uint8_t&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;a)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;array is [%u, %u, %u, %u]&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;a[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;],&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;a[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;],&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;a[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;],&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;a[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/print_array.html&#34;&gt;print_array.html&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/print_array.tar.gz&#34;&gt;print_array.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/print_array.zip&#34;&gt;print_array.zip&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;As a next step, let&amp;rsquo;s put these ideas to work through the task of printing
+&amp;lsquo;hello world&amp;rsquo; via passing an array of C characters (or, equivalently, an array
+of unsigned 8 bit integers) from JavaScript to a C program. This is mostly
+unnecessary as Emscripten allows you to pass JavaScript &lt;code&gt;String&lt;/code&gt; types but
+nontheless it will come in useful in the next step.&lt;/p&gt;
+
+&lt;p&gt;The important function at this juncture is the JavaScript &lt;code&gt;String&lt;/code&gt; method
+&lt;a href=&#34;https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt&#34;&gt;&lt;code&gt;charCodeAt(index)&lt;/code&gt;&lt;/a&gt;
+which returns the character code (for our purposes, the ASCII value) of the
+character at position &lt;code&gt;index&lt;/code&gt; in the string.&lt;/p&gt;
+
+&lt;p&gt;This means that if we replace &lt;code&gt;start_function&lt;/code&gt; from the previous example with
+the following:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;start_function&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;test_string&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;hello world!&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Uint8Array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;test_string&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;test_string&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;test_string&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;charCodeAt&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;test_string&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and the &lt;code&gt;print_array&lt;/code&gt; C function with:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;print_array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;a)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;printf(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;string is &amp;#39;%s&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;a);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;then we can see that we&amp;rsquo;ve successfully converted a JavaScript &lt;code&gt;String&lt;/code&gt; into a C
+string and passed it from JavaScript to the Emscripten run-time. This trick will
+turn out to be handy in the next section where we will end up converting the
+bytes of the image we want to view in our viewer into a &lt;code&gt;String&lt;/code&gt; and then converting
+that, in turn, into a &lt;code&gt;Uint8Array&lt;/code&gt; for passing into the C program.&lt;/p&gt;
+
+&lt;p&gt;It should probably be mentioned here that if you&amp;rsquo;re going to try and write to
+the array in the C code and expect your changes to be still there when you
+access them back in JavaScript land you&amp;rsquo;re going to be sorely disappointed,
+array function arguments are passed on the stack in Emscripten and so don&amp;rsquo;t
+persist. There are ways of achieving persistence, but they&amp;rsquo;ll have to wait for
+another day.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-picture-paints-1000-words-if-you-know-how-to-make-it&#34;&gt;A Picture Paints 1000 Words (if you know how to make it)&lt;/h2&gt;
+
+&lt;p&gt;We now have the capability of passing arbritrary data from JavaScript to an
+Emscripten C function and, if that arbritrary data happens to be the bytes of a
+png file, can turn that into an SDL_Surface. The final step then is to take an
+&lt;code&gt;HTMLImageElement&lt;/code&gt; and somehow get the bytes of the underlying png image from
+it.&lt;/p&gt;
+
+&lt;p&gt;You have to take a somewhat roundabout route to achieve this, but it&amp;rsquo;s do-able.
+As an overview, you have to load the image element onto a canvas, and then use
+the &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL&#34;&gt;&lt;code&gt;toDataURL()&lt;/code&gt;&lt;/a&gt;
+method of the canvas to get a data URI for the image. For the uninitiated, a
+data URI is a base64 encoded (that is an encoding where a character is
+represented by 6 bits rather than 8) string which is the binary representation
+of an image. The idea is that data URIs can be used to include an image file
+directly in an HTML document via the &lt;code&gt;src&lt;/code&gt; attribute of an image element rather
+than the more usual method of setting the &lt;code&gt;src&lt;/code&gt; attribute to a URL for which a
+separate request must be made. By converting this base64 JavaScript string to be
+ASCII and loading it into a &lt;code&gt;Uint8Array&lt;/code&gt; for passing to the C program we can
+achieve our goal of making the bytes of a HTMLImageElement accessible by SDL2.
+There&amp;rsquo;s even a JavaScript helper function &lt;code&gt;atob()&lt;/code&gt; which converts a base64
+encoded string to ASCII for us.&lt;/p&gt;
+
+&lt;p&gt;Doing all this, the JavaScript for getting the bytes from an image will look
+something like this:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;img&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;src&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;static/owl.png&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;onLoad&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;get_bytes(this)&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;text/javascript&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #75715e&#34;&gt;// get bytes of the image&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;get_bytes&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;img&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;){&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// create a temporary canvas element for this task&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;createElement&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;canvas&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// set it to have same size of underlying image&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;width&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;img&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;naturalWidth&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;height&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;img&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;naturalHeight&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// load the image in the canvas&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;getContext&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;2d&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;drawImage&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;img&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// convert the image to a data URI.&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// A data URI has a prefix describing the type of data the string &lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// following contains, we don&amp;#39;t need this so just replace it with nothing&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;string_data&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;toDataURL&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;image/png&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;replace&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;/^data:image\/(png|jpg);base64,/&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// change the data URI from a base64 to an ASCII encoded string&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;decoded_data&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;atob&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;string_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// make an unsigned 8 bit int typed array large enough to hold image data&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;array_data&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Uint8Array&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;decoded_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// convert ASCII string to unsigned 8 bit int array&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;decoded_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;array_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;decoded_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;charCodeAt&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+
+        &lt;span style=&#34;color: #75715e&#34;&gt;// just show this data on the console, for now...&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;array_data&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For now, we just print the byte array to console rather than sending it to the C
+program, but we can see from looking at the array that the bytes two to four are
+the values &lt;code&gt;80&lt;/code&gt;, &lt;code&gt;78&lt;/code&gt;, &lt;code&gt;71&lt;/code&gt;, that is the ASCII codes for the letters &amp;lsquo;P&amp;rsquo;, &amp;lsquo;N&amp;rsquo;
+and &amp;lsquo;G&amp;rsquo;, as required by the &lt;a href=&#34;https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header&#34;&gt;file header of a png file&lt;/a&gt;.
+It&amp;rsquo;s starting to ominously look like things are going to work&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Rather than just logging the data, we just need to pass it to that C function
+&lt;a href=&#34;#load_image_section&#34;&gt;&lt;code&gt;load_image&lt;/code&gt;&lt;/a&gt; we discussed writing so long ago. There are
+one or two subtleties that should be taken into account; you need to be aware
+that the image byte getting function may well end up being called before the
+Emscripten run-time is loaded and the exported image loading function set up,
+or, conversely, that Emscripten may be loaded and ready to go before any image
+bytes have been got and so there is no image to show. I circumvent this
+potential problem by initialising a &lt;code&gt;load_image&lt;/code&gt; variable to 0 and later
+overwriting it with the wrapped &lt;code&gt;load_image&lt;/code&gt; C function once Emscripten has
+loaded, and having a &lt;code&gt;image_bytes&lt;/code&gt; variable, similary set to 0 and overwritten
+with the image byte array once the image bytes have been retrieved. In this way
+you can figure out in the code when the &lt;code&gt;load_image&lt;/code&gt; function or &lt;code&gt;image_bytes&lt;/code&gt;
+are available.&lt;/p&gt;
+
+&lt;p&gt;The example below is very simple, featuring two &lt;code&gt;HTMLImageElement&lt;/code&gt;s and having
+the &lt;code&gt;onClick&lt;/code&gt; handler of both of them call an exported C function that changes
+the texture that SDL shows (after remembering to free any previously created
+texture, of course!). The initialisation of SDL and creation of the
+&lt;code&gt;SDL_Renderer&lt;/code&gt; are done only once, in a separate exported C function, and since
+the context is kept in a virtual scope it is persistent and available after this
+initialising function is called and for every subsequent call of &lt;code&gt;load_image&lt;/code&gt;.
+See the source code below for details&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/basic_image_viewer_screen_shot.png&#34; alt=&#34;basic image viewer screenshot&#34;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;show_img.html&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/show_img.tar.gz&#34;&gt;show_img.tar.gz&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/show_img.zip&#34;&gt;show_img.zip&lt;/a&gt;]&lt;/p&gt;
+
+&lt;h2 id=&#34;wrapping-it-all-up&#34;&gt;Wrapping It All Up&lt;/h2&gt;
+
+&lt;p&gt;Our image viewer as-is provides the bare bones for a zoomable image viewer;
+the bytes of &lt;code&gt;HTMLImageElements&lt;/code&gt; can be passed to an Emscripten C program where we
+can load them into an &lt;code&gt;SDL_Texture&lt;/code&gt; and from that point any manipulations such
+as panning or zooming will be much easier to achieve and possibly handled by
+webGL if the client supports it.&lt;/p&gt;
+
+&lt;p&gt;It remains though to create a nice interface to all this, this means providing
+the neat object interface to an image viewer mentioned at the start, bundling
+the JavaScript code that&amp;rsquo;s been produced so it can be easily included in a page
+and protecting the scope of the produced code so that the variables don&amp;rsquo;t polute
+the global JavaScript scope and a user can easily include multiple image viewers
+in a page.&lt;/p&gt;
+
+&lt;p&gt;All the JavaScript that Emscripten&amp;rsquo;s produced so far has started with something
+similar to the following bit of JavaScript:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;typeof&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;===&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;undefined&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;{};&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// and then a long load of&lt;/span&gt;
+                                                     &lt;span style=&#34;color: #75715e&#34;&gt;// hard to understand JavaScript&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In other words, a Module object is introduced into the current scope (in
+examples we&amp;rsquo;ve done so this has been the global scope). This is bad from the
+point of view of providing a neat encapsulated interface; a user naively including
+this code twice in a page would simply overwrite all Emscripten&amp;rsquo;s carefully
+declared variables and they wouldn&amp;rsquo;t get the two image viewers they were
+wanting.&lt;/p&gt;
+
+&lt;p&gt;What is needed is a function to be defined encapsulating all this code which can
+be called with a set of options and each time sets up a separate Emscripten
+runtime. As luck would have it a couple of &lt;code&gt;emcc&lt;/code&gt; compile time options can
+achieve that very effect. The setting &lt;code&gt;-s MODULARIZE=1&lt;/code&gt; tells Emscripten to
+produce the following JavaScript instead of that described above:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;EXPORT_NAME&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;||&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{};&lt;/span&gt;
+
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;Module&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// and then a long load of hard&lt;/span&gt;
+                &lt;span style=&#34;color: #75715e&#34;&gt;// to understand JavaScript&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;EXPORT_NAME&lt;/code&gt; is a string defined by the &lt;code&gt;emcc&lt;/code&gt; setting &lt;code&gt;-s EXPORT_NAME&lt;/code&gt;. For
+example, including the setting &lt;code&gt;-s EXPORT_NAME=&amp;quot;&#39;EmImgViewer&#39;&amp;quot;&lt;/code&gt; when &lt;code&gt;emcc&lt;/code&gt; is
+called will lead to a function named &lt;code&gt;EmImgViewer&lt;/code&gt; being added to the current
+scope. Calling this function with a &lt;code&gt;Module&lt;/code&gt; configuration object, the same as
+the Module object we were defining in global scope previously, will lead to an
+Emscripten runtime being created. Calling &lt;code&gt;EmImgViewer&lt;/code&gt; will create an
+Emscripten image viewer, calling &lt;code&gt;EmImgViewer&lt;/code&gt; again, with a different
+configuration option, perhaps specifying a different canvas and different
+functions to use to wrap exported functions, will create a completely separate
+&lt;code&gt;EmImgViewer&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;This is still not the friendliest interface to provide to a user; firstly, they
+have to know all about Emscripten and the configuration option object they need
+to pass to &lt;code&gt;EmImgViewer&lt;/code&gt;, secondly, they need to know about C functions that are
+exported by the &lt;code&gt;EmImgViewer&lt;/code&gt; so they can wrap them in JavaScript functions and
+so manipulate the viewer. For this reason, we need to hand-craft a bit more
+JavaScript to neaten up the interface and make the image viewer more easily
+usable.&lt;/p&gt;
+
+&lt;p&gt;We will put this in a file, &lt;code&gt;post_img_viewer.js&lt;/code&gt;, that will be appended to the
+compiled JavaScript and define an &lt;code&gt;ImgViewer&lt;/code&gt; object. When constructed, through
+a call to &lt;code&gt;ImgViewer(image, canvas)&lt;/code&gt;, the user specifies an initial image and a
+canvas to use for a display. At this point the Emscripten runtime is created, a
+call back defined to set-up the viewer when the runtime is ready, and the bytes
+of the image element are prepared for viewing.
+The construtor of the object will look something like this:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ImgViewer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas_element&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #75715e&#34;&gt;// Uint8Array of bytes of image will be stored here&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #75715e&#34;&gt;// Emscripten exported function for loading an image into&lt;/span&gt;
+    &lt;span style=&#34;color: #75715e&#34;&gt;// the viewer will be stored here&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImage&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImageBytes&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// function gets bytes of `image` and stores an array of &lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// these bytes in image_bytes&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;options&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+      &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+          &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas_element&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// set the canvas to be what the&lt;/span&gt;
+                                 &lt;span style=&#34;color: #75715e&#34;&gt;// user specified&lt;/span&gt;
+      &lt;span style=&#34;color: #f8f8f2&#34;&gt;})(),&lt;/span&gt;
+      &lt;span style=&#34;color: #a6e22e&#34;&gt;onRuntimeInitialized&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+          &lt;span style=&#34;color: #66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ccall&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;setup_context&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// once runtime is initialized&lt;/span&gt;
+                                             &lt;span style=&#34;color: #75715e&#34;&gt;// call the C function to&lt;/span&gt;
+                                             &lt;span style=&#34;color: #75715e&#34;&gt;// initialize SDL and set up the&lt;/span&gt;
+                                             &lt;span style=&#34;color: #75715e&#34;&gt;// context&lt;/span&gt;
+
+          &lt;span style=&#34;color: #75715e&#34;&gt;// wrap the `load_image` C function in a private method of &lt;/span&gt;
+          &lt;span style=&#34;color: #75715e&#34;&gt;// this object&lt;/span&gt;
+          &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImage&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;cwrap&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;load_image&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;array&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;number&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
+
+          &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// if an image has already been loaded by the time&lt;/span&gt;
+                           &lt;span style=&#34;color: #75715e&#34;&gt;// this call back is called, load the image bytes&lt;/span&gt;
+                           &lt;span style=&#34;color: #75715e&#34;&gt;// into the viewer&lt;/span&gt;
+          &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImage&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+          &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+      &lt;span style=&#34;color: #f8f8f2&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+
+    &lt;span style=&#34;color: #75715e&#34;&gt;// load the initial image&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImageBytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #75715e&#34;&gt;// create an image viewer with the options&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;EmImgViewer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;options&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+
+    &lt;span style=&#34;color: #75715e&#34;&gt;// TODO return the object interface...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After the object is constructed, we should return the object&amp;rsquo;s interface &amp;ndash; the set
+of public methods that the user can call. In this case, the interface is one
+method, &lt;code&gt;changeImage&lt;/code&gt;. This is quite simple, all it has to do is load the image
+bytes from the &lt;code&gt;HTMLImageElement&lt;/code&gt; passed to it as an argument and then call the
+wrapped &lt;code&gt;load_image&lt;/code&gt; C function to put these bytes onto the canvas:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;    &lt;span style=&#34;color: #75715e&#34;&gt;// returning the object interface...&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;changeImage&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// method to change viewer&amp;#39;s image&lt;/span&gt;
+                                          &lt;span style=&#34;color: #75715e&#34;&gt;// to the HTTPImageElement `image`&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImageBytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+            &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;loadImage&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+                &lt;span style=&#34;color: #a6e22e&#34;&gt;loadImage&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;image_bytes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Upon altering the &lt;code&gt;Makefile&lt;/code&gt; of the project to concatenate this JavaScript file
+at the end of the Emscripten produced JavaScript, we are left with one script
+file that our image viewer users should include in a page in order to use our
+image viewer. All that is required in order to use the image viewer is that this
+script be included and the &lt;code&gt;ImgViewer&lt;/code&gt; constructor called specifying the &lt;code&gt;image&lt;/code&gt;
+to be shown and the &lt;code&gt;canvas&lt;/code&gt; to show it on. An example of how to do this is
+given below:&lt;/p&gt;
+
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;text/javascript&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;src&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;img_viewer.js&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;text/javascript&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;setup_viewer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;document.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;getElementById&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;canvas&amp;#39;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;viewer&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;ImgViewer&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;script&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;head&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;body&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;div&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;img&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;src&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;static/owl.png&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;onLoad&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;setup_viewer(this)&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;onClick&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;viewer.changeImage(this)&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;img&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;src&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;static/cat.png&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;onClick&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;viewer.changeImage(this)&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;canvas&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;canvas&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;canvas&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;div&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It is worth reemphasising that because the Emscripten code is now nicely
+encapsulated, there is nothing to stop an &lt;code&gt;ImgViewer&lt;/code&gt; being instantiated being
+given a different &lt;code&gt;canvas&lt;/code&gt; element and voila, with no effort you have two image
+viewers on one page! See the example and source code below for details:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/double_image_viewer_screen_shot.png&#34; alt=&#34;double image viewer screenshot&#34;&gt;
+&lt;/a&gt;
+[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;img_viewer.html&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/img_viewer.tar.gz&#34;&gt;img_viewer.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;http://lyceum-allotments.github.io/code/img_viewer.zip&#34;&gt;img_viewer.zip&lt;/a&gt;]&lt;/p&gt;
+
+&lt;h2 id=&#34;the-final-product&#34;&gt;The Final Product&lt;/h2&gt;
+
+&lt;p&gt;The steps that remain now are all SDL and C. Events such as mouse button clicks
+must be listened to and converted into manipultions of the &lt;code&gt;SDL_Texture&lt;/code&gt;
+containing the image. There is nothing specific to Emscripten here except for
+the calling of &lt;code&gt;emscripten_set_main_loop&lt;/code&gt; rather than having a main animation
+loop, as described &lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Links to an example page using the &lt;code&gt;ImgViewer&lt;/code&gt; and to the github repository
+containing the &lt;code&gt;ImgViewer&lt;/code&gt; library are included below.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;newsham_park.html&lt;/a&gt;, &lt;a href=&#34;https://github.com/lyceum-allotments/img_viewer&#34;&gt;img_viewer_repository&lt;/a&gt;]&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Emscripten and SDL 2 Tutorial Part 1</title>
@@ -739,14 +1276,16 @@ loading message that disappears when the game has loaded. This would make our
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Finally, we&amp;rsquo;ll not start the application running straight away, but add a button
+&lt;p&gt;&lt;span id=&#34;ccall_section&#34;&gt;
+Finally, we&amp;rsquo;ll not start the application running straight away, but add a button
 that starts the application. The &lt;code&gt;Module&lt;/code&gt; object has a
 &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall&#34;&gt;&lt;code&gt;ccall&lt;/code&gt;&lt;/a&gt;
 method that can be used to call a C function from JavaScript. It takes three
 argumments, the first is a string containing the name of the function, the next
 gives the expected return type, the next is an array describing the types of the
 arguments the C function takes. By renaming our &lt;code&gt;main&lt;/code&gt; function in our C
-program, say by giving it the signature:&lt;/p&gt;
+program, say by giving it the signature:
+&lt;/span&gt;&lt;/p&gt;
 
 &lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;mainf&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;();&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;

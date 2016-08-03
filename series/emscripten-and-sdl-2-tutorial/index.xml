@@ -739,14 +739,16 @@ loading message that disappears when the game has loaded. This would make our
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Finally, we&amp;rsquo;ll not start the application running straight away, but add a button
+&lt;p&gt;&lt;span id=&#34;ccall_section&#34;&gt;
+Finally, we&amp;rsquo;ll not start the application running straight away, but add a button
 that starts the application. The &lt;code&gt;Module&lt;/code&gt; object has a
 &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html#ccall&#34;&gt;&lt;code&gt;ccall&lt;/code&gt;&lt;/a&gt;
 method that can be used to call a C function from JavaScript. It takes three
 argumments, the first is a string containing the name of the function, the next
 gives the expected return type, the next is an array describing the types of the
 arguments the C function takes. By renaming our &lt;code&gt;main&lt;/code&gt; function in our C
-program, say by giving it the signature:&lt;/p&gt;
+program, say by giving it the signature:
+&lt;/span&gt;&lt;/p&gt;
 
 &lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;mainf&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;();&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;

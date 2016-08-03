@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Emscripten Image Viewer</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="http://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="http://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="http://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="http://lyceum-allotments.github.io/img/lyceum_allotments.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/">Emscripten Image Viewer</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Aug 03, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		
+
+<p>Recently I&rsquo;ve ben playing around with developing a zoomable and panning
+image viewer using Emscripten and its proved to be a good exercise in accessing
+parts of the page&rsquo;s HTML document outside of the Emscripten run-time.</p>
+
+<p><a href="/pages/newsham_park/newsham_park.html">
+<img style="display:block;margin-left:auto;margin-right:auto" src="/images/complete_image_viewer_screen_shot.png" alt="complete image viewer screenshot">
+</a></p>
+
+<p>The end goal is to provide a JavaScript API to an image viewer, consisting of an
+<code>ImgViewer</code> object and a single method:</p>
+
+<ul>
+<li><code>ImgViewer(image, canvas)</code> &ndash; sets up the viewer to use the
+<code>HTMLCanvasElement</code>, <code>canvas</code> and show a pannable and zoomable copy of the
+<code>HTMLImageElement</code>, <code>image</code></li>
+<li><code>ImgViewer.changeImage(image)</code> &ndash; changes the image shown by the image viewer to the
+<code>HTMLImageElement</code>, <code>image</code></li>
+</ul>
+
+<p>The main bit of ground here that I didn&rsquo;t cover in my previous
+<a href="/2016/06/emscripten-and-sdl-2-tutorial-part-1/">tutorial on Emscripten and SDL2</a>,
+is how to somehow get the image data from the <code>HTMLImageElement</code> to be
+accessible from the Emscripten compiled C program.</p>
+
+<p>Previously, images were loaded using Emscripten&rsquo;s concept of a virtual
+filesystem, where assets are &lsquo;preloaded&rsquo; with an XML HTTP request. This is very
+good for keeping changes down to a minimum when porting desktop applications to
+run in the browser, but it can be equally useful to access parts of the HTML
+document from within an Emscripten compiled C program. In this post, the image
+data from an <code>HTMLImageElement</code> will be accessed and used within SDL2 to make a
+zoomable and panning image viewer, but the concepts explored here could be used
+for any number of applications, using the speed of JavaScript produced Emscripten
+to do client-side image processing is one example.</p>
+
+<h2 id="what-c-wants">What C Wants</h2>
+
+<p>Let&rsquo;s tackle this problem from the C side of things back, outwards, to what we
+need to do in JavaScript. What our C program will require is a pointer to the
+chunk of memory containing the image data we wish to show in our image viewer
+(along with how many bytes make up the image data). Once we have this, SDL has
+the concept of a <a href="https://wiki.libsdl.org/SDL_RWops"><code>SDL_RWops</code></a> structure, to
+provide a common interface for reading from all sorts of stream devices. Using
+the function</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">SDL_RWops</span><span style="color: #f92672">*</span> <span style="color: #a6e22e">SDL_RWFromConstMem</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">const</span> <span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">mem,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">size);</span>
+</pre></div>
+
+
+<p>can create a <code>SDL_RWops</code> from a pointer to some constant memory.</p>
+
+<p>This can then be passed to the SDL_image function,
+<a href="http://jcatki.no-ip.org:8080/SDL_image/SDL_image.html#SEC12"><code>IMG_Load_RW</code></a>:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">SDL_Surface</span> <span style="color: #f92672">*</span><span style="color: #a6e22e">IMG_Load_RW</span><span style="color: #f8f8f2">(SDL_RWops</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">src,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">freesrc);</span>
+</pre></div>
+
+
+<p>which reads the memory referred to by <code>SDL_RWops</code> and gives us a SDL_Surface
+pointer that we can turn into a texture and render in the
+<a href="/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/">usual way</a>.</p>
+
+<p><span id="load_image_section">
+In code, the C function for changing the image will look something like this:
+</span></p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">context</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #f8f8f2">SDL_Renderer</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">renderer;</span>
+
+    <span style="color: #f8f8f2">SDL_Texture</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">img_tex;</span>
+<span style="color: #f8f8f2">};</span>
+<span style="color: #66d9ef">struct</span> <span style="color: #f8f8f2">context</span> <span style="color: #f8f8f2">ctx;</span>
+
+<span style="color: #75715e">// Set up renderer in context before calling this function</span>
+
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">load_image</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">image_data,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">size)</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #f8f8f2">SDL_RWops</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">a</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">SDL_RWFromConstMem(image_data,</span> <span style="color: #f8f8f2">size);</span>
+    <span style="color: #f8f8f2">SDL_Surface</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">image</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">IMG_Load_RW(a,</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">);</span>
+
+    <span style="color: #f8f8f2">ctx.img_tex</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">SDL_CreateTextureFromSurface(ctx.renderer,</span> <span style="color: #f8f8f2">image);</span>
+
+    <span style="color: #f8f8f2">SDL_FreeSurface(image);</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+
+<h2 id="providing-what-c-wants">Providing What C Wants</h2>
+
+<p>We&rsquo;ve a long way to go yet though. The next step is to be able to call the C
+function from JavaScript, passing it a pointer to some &lsquo;memory&rsquo; we&rsquo;ve previously
+written to in JavaScript. I&rsquo;ve put &lsquo;memory&rsquo; in inverted commas because
+JavaScript isn&rsquo;t the sort of language that goes around just handing out access
+to raw memory. I&rsquo;ve alluded in the past to how Emscripten provides C programs
+with the illusion of memory through
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays">typed arrays</a>
+&ndash; similar in interface to a JavaScript
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a>
+but containing elements all of same type. In the same way that C programs can cast
+a <code>char *</code> to an <code>int *</code> and by doing so change what data-type the array is
+treated as, JavaScript has the concept of a &lsquo;view&rsquo; of an array buffer;
+<code>var ta = Uint8Array(buffer)</code> will view the array buffer <code>buffer</code> as an array of
+unsigned 8 bit integers, <code>var tb = Uint32Array(buffer)</code> will access the same
+data as an array of unsigned 32 bit integers.</p>
+
+<p>As an illustration,
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">ta</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">Uint8Array</span><span style="color: #f8f8f2">([</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">]);</span>
+<span style="color: #a6e22e">console</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">log</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">ta</span><span style="color: #f8f8f2">[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]);</span> <span style="color: #75715e">// prints 1</span>
+<span style="color: #66d9ef">var</span> <span style="color: #a6e22e">tb</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">Uint32Array</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">ta</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">buffer</span><span style="color: #f8f8f2">);</span>
+<span style="color: #a6e22e">console</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">log</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">tb</span><span style="color: #f8f8f2">[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]);</span> <span style="color: #75715e">// prints 16777729 (1 + 2 * 2^8 + 0 * 2^16 + 1 * 2^24)</span>
+</pre></div>
+</p>
+
+<p>Which is broadly similar to doing the following in C:
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">uint8_t</span> <span style="color: #f8f8f2">ta[]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%u</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">ta[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]);</span> <span style="color: #75715e">// prints 1</span>
+<span style="color: #66d9ef">uint32_t</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">tb</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">uint32_t</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">)ta;</span>
+<span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;%u</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">tb[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">]);</span> <span style="color: #75715e">// prints 16777729</span>
+</pre></div>
+</p>
+
+<p>Typed arrays can be passed C side by the Emscripten provided JavaScript
+functions <code>ccall</code> and <code>cwrap</code>. I&rsquo;ve discussed <code>ccall</code>
+<a href="/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/#ccall_section">before</a>,
+<code>cwrap</code> is similar, but returns a JavaScript function that can be used for calling
+the &lsquo;wrapped&rsquo; C function rather than calling it directly. If a C function
+<code>void print_array(void *a)</code> has been exported when Emscripten was compiled, a
+function, <code>print_array_js</code> taking a typed array as an argument can be created
+like so:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #a6e22e">print_array_js</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">cwrap</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;print_array&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">NULL</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;array&#39;</span><span style="color: #f8f8f2">]);</span>
+</pre></div>
+
+
+<p>Putting all these concepts together let&rsquo;s show how you&rsquo;d create an array of
+unsigned 8-bit integers in JavaScript and print them in the C program.</p>
+
+<p>The guts of the HTML document will be:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>    <span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">textarea</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;output&quot;</span><span style="color: #f8f8f2">&gt;&lt;/</span><span style="color: #f92672">textarea</span><span style="color: #f8f8f2">&gt;</span>
+    <span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span><span style="color: #f8f8f2">&gt;</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">print_array</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span> <span style="color: #75715e">// when Emscripten run-time loads, will be overwritten</span>
+                             <span style="color: #75715e">// by function wrapper over a C print_array function</span>
+
+        <span style="color: #75715e">// Creates a typed array and passes this to C function for printing</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">start_function</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+            <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">array</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">Uint8Array</span><span style="color: #f8f8f2">([</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">4</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">6</span><span style="color: #f8f8f2">,</span><span style="color: #ae81ff">8</span><span style="color: #f8f8f2">]);</span>
+            <span style="color: #a6e22e">print_array</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">array</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #f8f8f2">};</span>
+
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">Module</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+            <span style="color: #a6e22e">onRuntimeInitialized</span><span style="color: #f92672">:</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+                <span style="color: #75715e">// On load of Emscripten run-time, wrap the print_array C function and</span>
+                <span style="color: #75715e">// call &#39;start_function&#39; to get us underway</span>
+                <span style="color: #a6e22e">print_array</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">cwrap</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;print_array&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">null</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;array&#39;</span><span style="color: #f8f8f2">]);</span>
+                <span style="color: #a6e22e">start_function</span><span style="color: #f8f8f2">();</span>
+            <span style="color: #f8f8f2">},</span> 
+            <span style="color: #a6e22e">print</span><span style="color: #f92672">:</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">t</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+                <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">element</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">getElementById</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;output&#39;</span><span style="color: #f8f8f2">);</span>
+                <span style="color: #a6e22e">element</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">value</span> <span style="color: #f92672">+=</span> <span style="color: #a6e22e">t</span> <span style="color: #f92672">+</span> <span style="color: #e6db74">&quot;\n&quot;</span><span style="color: #f8f8f2">;</span>
+            <span style="color: #f8f8f2">},</span>
+        <span style="color: #f8f8f2">};</span>
+    <span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
+<p>while the C program will look like:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
+<span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdint.h&gt;</span>
+
+<span style="color: #66d9ef">void</span> <span style="color: #a6e22e">print_array</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">uint8_t</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">a)</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;array is [%u, %u, %u, %u]</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">a[</span><span style="color: #ae81ff">0</span><span style="color: #f8f8f2">],</span> <span style="color: #f8f8f2">a[</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">],</span> <span style="color: #f8f8f2">a[</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">],</span> <span style="color: #f8f8f2">a[</span><span style="color: #ae81ff">3</span><span style="color: #f8f8f2">]);</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+
+<p>[<a href="/pages/print_array.html">print_array.html</a>,
+<a href="/code/print_array.tar.gz">print_array.tar.gz</a>,
+<a href="/code/print_array.zip">print_array.zip</a>]</p>
+
+<p>As a next step, let&rsquo;s put these ideas to work through the task of printing
+&lsquo;hello world&rsquo; via passing an array of C characters (or, equivalently, an array
+of unsigned 8 bit integers) from JavaScript to a C program. This is mostly
+unnecessary as Emscripten allows you to pass JavaScript <code>String</code> types but
+nontheless it will come in useful in the next step.</p>
+
+<p>The important function at this juncture is the JavaScript <code>String</code> method
+<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt"><code>charCodeAt(index)</code></a>
+which returns the character code (for our purposes, the ASCII value) of the
+character at position <code>index</code> in the string.</p>
+
+<p>This means that if we replace <code>start_function</code> from the previous example with
+the following:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">start_function</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">test_string</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;hello world!&quot;</span><span style="color: #f8f8f2">;</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">array</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">Uint8Array</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">test_string</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span> <span style="color: #f92672">+</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">);</span>
+
+    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span> <span style="color: #a6e22e">i</span> <span style="color: #f92672">&lt;</span> <span style="color: #a6e22e">test_string</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">;</span> <span style="color: #a6e22e">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #f8f8f2">{</span>
+        <span style="color: #a6e22e">array</span><span style="color: #f8f8f2">[</span><span style="color: #a6e22e">i</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">test_string</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">charCodeAt</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">i</span><span style="color: #f8f8f2">);</span>
+    <span style="color: #f8f8f2">}</span>
+    <span style="color: #a6e22e">array</span><span style="color: #f8f8f2">[</span><span style="color: #a6e22e">test_string</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+
+    <span style="color: #a6e22e">print_array</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">array</span><span style="color: #f8f8f2">);</span>
+<span style="color: #f8f8f2">};</span>
+</pre></div>
+
+
+<p>and the <code>print_array</code> C function with:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #a6e22e">print_array</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">char</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">a)</span>
+<span style="color: #f8f8f2">{</span>
+    <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;string is &#39;%s&#39;</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">a);</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+
+<p>then we can see that we&rsquo;ve successfully converted a JavaScript <code>String</code> into a C
+string and passed it from JavaScript to the Emscripten run-time. This trick will
+turn out to be handy in the next section where we will end up converting the
+bytes of the image we want to view in our viewer into a <code>String</code> and then converting
+that, in turn, into a <code>Uint8Array</code> for passing into the C program.</p>
+
+<p>It should probably be mentioned here that if you&rsquo;re going to try and write to
+the array in the C code and expect your changes to be still there when you
+access them back in JavaScript land you&rsquo;re going to be sorely disappointed,
+array function arguments are passed on the stack in Emscripten and so don&rsquo;t
+persist. There are ways of achieving persistence, but they&rsquo;ll have to wait for
+another day.</p>
+
+<h2 id="a-picture-paints-1000-words-if-you-know-how-to-make-it">A Picture Paints 1000 Words (if you know how to make it)</h2>
+
+<p>We now have the capability of passing arbritrary data from JavaScript to an
+Emscripten C function and, if that arbritrary data happens to be the bytes of a
+png file, can turn that into an SDL_Surface. The final step then is to take an
+<code>HTMLImageElement</code> and somehow get the bytes of the underlying png image from
+it.</p>
+
+<p>You have to take a somewhat roundabout route to achieve this, but it&rsquo;s do-able.
+As an overview, you have to load the image element onto a canvas, and then use
+the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code>toDataURL()</code></a>
+method of the canvas to get a data URI for the image. For the uninitiated, a
+data URI is a base64 encoded (that is an encoding where a character is
+represented by 6 bits rather than 8) string which is the binary representation
+of an image. The idea is that data URIs can be used to include an image file
+directly in an HTML document via the <code>src</code> attribute of an image element rather
+than the more usual method of setting the <code>src</code> attribute to a URL for which a
+separate request must be made. By converting this base64 JavaScript string to be
+ASCII and loading it into a <code>Uint8Array</code> for passing to the C program we can
+achieve our goal of making the bytes of a HTMLImageElement accessible by SDL2.
+There&rsquo;s even a JavaScript helper function <code>atob()</code> which converts a base64
+encoded string to ASCII for us.</p>
+
+<p>Doing all this, the JavaScript for getting the bytes from an image will look
+something like this:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">img</span> <span style="color: #a6e22e">src</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;static/owl.png&quot;</span> <span style="color: #a6e22e">onLoad</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;get_bytes(this)&quot;</span><span style="color: #f8f8f2">/&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span><span style="color: #f8f8f2">&gt;</span>
+    <span style="color: #75715e">// get bytes of the image</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">get_bytes</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">img</span><span style="color: #f8f8f2">){</span>
+        <span style="color: #75715e">// create a temporary canvas element for this task</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">canvas</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">createElement</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;canvas&#39;</span><span style="color: #f8f8f2">);</span>
+
+        <span style="color: #75715e">// set it to have same size of underlying image</span>
+        <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">width</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">img</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">naturalWidth</span><span style="color: #f8f8f2">;</span>
+        <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">height</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">img</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">naturalHeight</span><span style="color: #f8f8f2">;</span>
+
+        <span style="color: #75715e">// load the image in the canvas</span>
+        <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">getContext</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;2d&#39;</span><span style="color: #f8f8f2">).</span><span style="color: #a6e22e">drawImage</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">img</span><span style="color: #f8f8f2">,</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">,</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">);</span>
+
+        <span style="color: #75715e">// convert the image to a data URI.</span>
+        <span style="color: #75715e">// A data URI has a prefix describing the type of data the string </span>
+        <span style="color: #75715e">// following contains, we don&#39;t need this so just replace it with nothing</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">string_data</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">toDataURL</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;image/png&#39;</span><span style="color: #f8f8f2">)</span>
+            <span style="color: #f8f8f2">.</span><span style="color: #a6e22e">replace</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">/^data:image\/(png|jpg);base64,/</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&#39;&#39;</span><span style="color: #f8f8f2">);</span>
+
+        <span style="color: #75715e">// change the data URI from a base64 to an ASCII encoded string</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">decoded_data</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">atob</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">string_data</span><span style="color: #f8f8f2">);</span>
+
+        <span style="color: #75715e">// make an unsigned 8 bit int typed array large enough to hold image data</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">array_data</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #a6e22e">Uint8Array</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">decoded_data</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">);</span>
+
+        <span style="color: #75715e">// convert ASCII string to unsigned 8 bit int array</span>
+        <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">i</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span> <span style="color: #a6e22e">i</span> <span style="color: #f92672">&lt;</span> <span style="color: #a6e22e">decoded_data</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">;</span> <span style="color: #a6e22e">i</span><span style="color: #f92672">++</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">{</span>
+            <span style="color: #a6e22e">array_data</span><span style="color: #f8f8f2">[</span><span style="color: #a6e22e">i</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">decoded_data</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">charCodeAt</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">i</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #f8f8f2">}</span>
+
+        <span style="color: #75715e">// just show this data on the console, for now...</span>
+        <span style="color: #a6e22e">console</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">log</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">array_data</span><span style="color: #f8f8f2">);</span>
+    <span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
+<p>For now, we just print the byte array to console rather than sending it to the C
+program, but we can see from looking at the array that the bytes two to four are
+the values <code>80</code>, <code>78</code>, <code>71</code>, that is the ASCII codes for the letters &lsquo;P&rsquo;, &lsquo;N&rsquo;
+and &lsquo;G&rsquo;, as required by the <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header">file header of a png file</a>.
+It&rsquo;s starting to ominously look like things are going to work&hellip;</p>
+
+<p>Rather than just logging the data, we just need to pass it to that C function
+<a href="#load_image_section"><code>load_image</code></a> we discussed writing so long ago. There are
+one or two subtleties that should be taken into account; you need to be aware
+that the image byte getting function may well end up being called before the
+Emscripten run-time is loaded and the exported image loading function set up,
+or, conversely, that Emscripten may be loaded and ready to go before any image
+bytes have been got and so there is no image to show. I circumvent this
+potential problem by initialising a <code>load_image</code> variable to 0 and later
+overwriting it with the wrapped <code>load_image</code> C function once Emscripten has
+loaded, and having a <code>image_bytes</code> variable, similary set to 0 and overwritten
+with the image byte array once the image bytes have been retrieved. In this way
+you can figure out in the code when the <code>load_image</code> function or <code>image_bytes</code>
+are available.</p>
+
+<p>The example below is very simple, featuring two <code>HTMLImageElement</code>s and having
+the <code>onClick</code> handler of both of them call an exported C function that changes
+the texture that SDL shows (after remembering to free any previously created
+texture, of course!). The initialisation of SDL and creation of the
+<code>SDL_Renderer</code> are done only once, in a separate exported C function, and since
+the context is kept in a virtual scope it is persistent and available after this
+initialising function is called and for every subsequent call of <code>load_image</code>.
+See the source code below for details&hellip;</p>
+
+<p><a href="/pages/show_img.html">
+<img style="display:block;margin-left:auto;margin-right:auto" src="/images/basic_image_viewer_screen_shot.png" alt="basic image viewer screenshot">
+</a></p>
+
+<p>[<a href="/pages/show_img.html">show_img.html</a>,
+<a href="/code/show_img.tar.gz">show_img.tar.gz</a>, <a href="/code/show_img.zip">show_img.zip</a>]</p>
+
+<h2 id="wrapping-it-all-up">Wrapping It All Up</h2>
+
+<p>Our image viewer as-is provides the bare bones for a zoomable image viewer;
+the bytes of <code>HTMLImageElements</code> can be passed to an Emscripten C program where we
+can load them into an <code>SDL_Texture</code> and from that point any manipulations such
+as panning or zooming will be much easier to achieve and possibly handled by
+webGL if the client supports it.</p>
+
+<p>It remains though to create a nice interface to all this, this means providing
+the neat object interface to an image viewer mentioned at the start, bundling
+the JavaScript code that&rsquo;s been produced so it can be easily included in a page
+and protecting the scope of the produced code so that the variables don&rsquo;t polute
+the global JavaScript scope and a user can easily include multiple image viewers
+in a page.</p>
+
+<p>All the JavaScript that Emscripten&rsquo;s produced so far has started with something
+similar to the following bit of JavaScript:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">;</span><span style="color: #66d9ef">if</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">typeof</span> <span style="color: #a6e22e">Module</span><span style="color: #f92672">===</span><span style="color: #e6db74">&quot;undefined&quot;</span><span style="color: #f8f8f2">)</span><span style="color: #a6e22e">Module</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">{};</span> <span style="color: #75715e">// and then a long load of</span>
+                                                     <span style="color: #75715e">// hard to understand JavaScript</span>
+</pre></div>
+
+
+<p>In other words, a Module object is introduced into the current scope (in
+examples we&rsquo;ve done so this has been the global scope). This is bad from the
+point of view of providing a neat encapsulated interface; a user naively including
+this code twice in a page would simply overwrite all Emscripten&rsquo;s carefully
+declared variables and they wouldn&rsquo;t get the two image viewers they were
+wanting.</p>
+
+<p>What is needed is a function to be defined encapsulating all this code which can
+be called with a set of options and each time sets up a separate Emscripten
+runtime. As luck would have it a couple of <code>emcc</code> compile time options can
+achieve that very effect. The setting <code>-s MODULARIZE=1</code> tells Emscripten to
+produce the following JavaScript instead of that described above:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">var</span> <span style="color: #a6e22e">EXPORT_NAME</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">Module</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">Module</span> <span style="color: #f92672">||</span> <span style="color: #f8f8f2">{};</span>
+
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">Module</span><span style="color: #f8f8f2">;</span> <span style="color: #75715e">// and then a long load of hard</span>
+                <span style="color: #75715e">// to understand JavaScript</span>
+<span style="color: #f8f8f2">};</span>
+</pre></div>
+
+
+<p><code>EXPORT_NAME</code> is a string defined by the <code>emcc</code> setting <code>-s EXPORT_NAME</code>. For
+example, including the setting <code>-s EXPORT_NAME=&quot;'EmImgViewer'&quot;</code> when <code>emcc</code> is
+called will lead to a function named <code>EmImgViewer</code> being added to the current
+scope. Calling this function with a <code>Module</code> configuration object, the same as
+the Module object we were defining in global scope previously, will lead to an
+Emscripten runtime being created. Calling <code>EmImgViewer</code> will create an
+Emscripten image viewer, calling <code>EmImgViewer</code> again, with a different
+configuration option, perhaps specifying a different canvas and different
+functions to use to wrap exported functions, will create a completely separate
+<code>EmImgViewer</code>.</p>
+
+<p>This is still not the friendliest interface to provide to a user; firstly, they
+have to know all about Emscripten and the configuration option object they need
+to pass to <code>EmImgViewer</code>, secondly, they need to know about C functions that are
+exported by the <code>EmImgViewer</code> so they can wrap them in JavaScript functions and
+so manipulate the viewer. For this reason, we need to hand-craft a bit more
+JavaScript to neaten up the interface and make the image viewer more easily
+usable.</p>
+
+<p>We will put this in a file, <code>post_img_viewer.js</code>, that will be appended to the
+compiled JavaScript and define an <code>ImgViewer</code> object. When constructed, through
+a call to <code>ImgViewer(image, canvas)</code>, the user specifies an initial image and a
+canvas to use for a display. At this point the Emscripten runtime is created, a
+call back defined to set-up the viewer when the runtime is ready, and the bytes
+of the image element are prepared for viewing.
+The construtor of the object will look something like this:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #a6e22e">ImgViewer</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">canvas_element</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #75715e">// Uint8Array of bytes of image will be stored here</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">image_bytes</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+
+    <span style="color: #75715e">// Emscripten exported function for loading an image into</span>
+    <span style="color: #75715e">// the viewer will be stored here</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">loadImage</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">;</span>
+
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">loadImageBytes</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #75715e">// function gets bytes of `image` and stores an array of </span>
+        <span style="color: #75715e">// these bytes in image_bytes</span>
+    <span style="color: #f8f8f2">};</span>
+
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">options</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+      <span style="color: #a6e22e">canvas</span><span style="color: #f92672">:</span> <span style="color: #f8f8f2">(</span><span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+          <span style="color: #66d9ef">return</span> <span style="color: #a6e22e">canvas_element</span><span style="color: #f8f8f2">;</span> <span style="color: #75715e">// set the canvas to be what the</span>
+                                 <span style="color: #75715e">// user specified</span>
+      <span style="color: #f8f8f2">})(),</span>
+      <span style="color: #a6e22e">onRuntimeInitialized</span><span style="color: #f92672">:</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+          <span style="color: #66d9ef">this</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">ccall</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;setup_context&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">null</span><span style="color: #f8f8f2">);</span> <span style="color: #75715e">// once runtime is initialized</span>
+                                             <span style="color: #75715e">// call the C function to</span>
+                                             <span style="color: #75715e">// initialize SDL and set up the</span>
+                                             <span style="color: #75715e">// context</span>
+
+          <span style="color: #75715e">// wrap the `load_image` C function in a private method of </span>
+          <span style="color: #75715e">// this object</span>
+          <span style="color: #a6e22e">loadImage</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">this</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">cwrap</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;load_image&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">null</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&#39;array&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&#39;number&#39;</span><span style="color: #f8f8f2">]);</span>
+
+          <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image_bytes</span><span style="color: #f8f8f2">)</span> <span style="color: #75715e">// if an image has already been loaded by the time</span>
+                           <span style="color: #75715e">// this call back is called, load the image bytes</span>
+                           <span style="color: #75715e">// into the viewer</span>
+          <span style="color: #f8f8f2">{</span>
+            <span style="color: #a6e22e">loadImage</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image_bytes</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">image_bytes</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">);</span>
+          <span style="color: #f8f8f2">}</span>
+      <span style="color: #f8f8f2">},</span>
+    <span style="color: #f8f8f2">};</span>
+
+    <span style="color: #75715e">// load the initial image</span>
+    <span style="color: #a6e22e">loadImageBytes</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">);</span>
+
+    <span style="color: #75715e">// create an image viewer with the options</span>
+    <span style="color: #a6e22e">EmImgViewer</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">options</span><span style="color: #f8f8f2">);</span>
+
+    <span style="color: #75715e">// TODO return the object interface...</span>
+</pre></div>
+
+
+<p>After the object is constructed, we should return the object&rsquo;s interface &ndash; the set
+of public methods that the user can call. In this case, the interface is one
+method, <code>changeImage</code>. This is quite simple, all it has to do is load the image
+bytes from the <code>HTMLImageElement</code> passed to it as an argument and then call the
+wrapped <code>load_image</code> C function to put these bytes onto the canvas:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>    <span style="color: #75715e">// returning the object interface...</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #e6db74">&#39;changeImage&#39;</span> <span style="color: #f92672">:</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span> <span style="color: #75715e">// method to change viewer&#39;s image</span>
+                                          <span style="color: #75715e">// to the HTTPImageElement `image`</span>
+            <span style="color: #a6e22e">loadImageBytes</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">);</span>
+            <span style="color: #66d9ef">if</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">loadImage</span><span style="color: #f8f8f2">)</span>
+                <span style="color: #a6e22e">loadImage</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image_bytes</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">image_bytes</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">length</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #f8f8f2">}</span>
+    <span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">};</span>
+</pre></div>
+
+
+<p>Upon altering the <code>Makefile</code> of the project to concatenate this JavaScript file
+at the end of the Emscripten produced JavaScript, we are left with one script
+file that our image viewer users should include in a page in order to use our
+image viewer. All that is required in order to use the image viewer is that this
+script be included and the <code>ImgViewer</code> constructor called specifying the <code>image</code>
+to be shown and the <code>canvas</code> to show it on. An example of how to do this is
+given below:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span> <span style="color: #a6e22e">src</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;img_viewer.js&#39;</span><span style="color: #f8f8f2">&gt;&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">script</span> <span style="color: #a6e22e">type</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;text/javascript&#39;</span><span style="color: #f8f8f2">&gt;</span>
+    <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">setup_viewer</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">function</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">)</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #66d9ef">var</span> <span style="color: #a6e22e">canvas</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">document.</span><span style="color: #a6e22e">getElementById</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;canvas&#39;</span><span style="color: #f8f8f2">);</span>
+        <span style="color: #a6e22e">viewer</span> <span style="color: #f92672">=</span> <span style="color: #a6e22e">ImgViewer</span><span style="color: #f8f8f2">(</span><span style="color: #a6e22e">image</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">canvas</span><span style="color: #f8f8f2">);</span>
+    <span style="color: #f8f8f2">};</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">script</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">head</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">body</span><span style="color: #f8f8f2">&gt;</span>
+
+<span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">div</span><span style="color: #f8f8f2">&gt;</span>
+    <span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">img</span> <span style="color: #a6e22e">src</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;static/owl.png&quot;</span> <span style="color: #a6e22e">onLoad</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;setup_viewer(this)&quot;</span> <span style="color: #a6e22e">onClick</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;viewer.changeImage(this)&quot;</span><span style="color: #f8f8f2">/&gt;</span>
+    <span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">img</span> <span style="color: #a6e22e">src</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;static/cat.png&quot;</span> <span style="color: #a6e22e">onClick</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;viewer.changeImage(this)&quot;</span><span style="color: #f8f8f2">/&gt;</span>
+    <span style="color: #f8f8f2">&lt;</span><span style="color: #f92672">canvas</span> <span style="color: #a6e22e">id</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;canvas&quot;</span><span style="color: #f8f8f2">&gt;&lt;/</span><span style="color: #f92672">canvas</span><span style="color: #f8f8f2">&gt;</span>
+<span style="color: #f8f8f2">&lt;/</span><span style="color: #f92672">div</span><span style="color: #f8f8f2">&gt;</span>
+</pre></div>
+
+
+<p>It is worth reemphasising that because the Emscripten code is now nicely
+encapsulated, there is nothing to stop an <code>ImgViewer</code> being instantiated being
+given a different <code>canvas</code> element and voila, with no effort you have two image
+viewers on one page! See the example and source code below for details:</p>
+
+<p><a href="/pages/img_viewer/img_viewer.html">
+<img style="display:block;margin-left:auto;margin-right:auto" src="/images/double_image_viewer_screen_shot.png" alt="double image viewer screenshot">
+</a>
+[<a href="/pages/img_viewer/img_viewer.html">img_viewer.html</a>,
+<a href="/code/img_viewer.tar.gz">img_viewer.tar.gz</a>,
+<a href="/code/img_viewer.zip">img_viewer.zip</a>]</p>
+
+<h2 id="the-final-product">The Final Product</h2>
+
+<p>The steps that remain now are all SDL and C. Events such as mouse button clicks
+must be listened to and converted into manipultions of the <code>SDL_Texture</code>
+containing the image. There is nothing specific to Emscripten here except for
+the calling of <code>emscripten_set_main_loop</code> rather than having a main animation
+loop, as described <a href="/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/">here</a>.</p>
+
+<p>Links to an example page using the <code>ImgViewer</code> and to the github repository
+containing the <code>ImgViewer</code> library are included below.</p>
+
+<p><a href="/pages/newsham_park/newsham_park.html">
+<img style="display:block;margin-left:auto;margin-right:auto" src="/images/complete_image_viewer_screen_shot.png" alt="complete image viewer screenshot">
+</a></p>
+
+<p>[<a href="/pages/newsham_park/newsham_park.html">newsham_park.html</a>, <a href="https://github.com/lyceum-allotments/img_viewer">img_viewer_repository</a>]</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

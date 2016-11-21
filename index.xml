@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>The Lyceum Allotments</title>
-    <link>http://lyceum-allotments.github.io/</link>
+    <link>https://lyceum-allotments.github.io/</link>
     <description>Recent content on The Lyceum Allotments</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 03 Aug 2016 10:14:48 +0100</lastBuildDate>
-    <atom:link href="http://lyceum-allotments.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://lyceum-allotments.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Emscripten Image Viewer</title>
-      <link>http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</link>
+      <link>https://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</link>
       <pubDate>Wed, 03 Aug 2016 10:14:48 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/</guid>
       <description>
 
 &lt;p&gt;Recently I&amp;rsquo;ve ben playing around with developing a zoomable and panning
 image viewer using Emscripten and its proved to be a good exercise in accessing
 parts of the page&amp;rsquo;s HTML document outside of the Emscripten run-time.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
-&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
 &lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;The end goal is to provide a JavaScript API to an image viewer, consisting of an
@@ -37,7 +37,7 @@ parts of the page&amp;rsquo;s HTML document outside of the Emscripten run-time.&
 &lt;/ul&gt;
 
 &lt;p&gt;The main bit of ground here that I didn&amp;rsquo;t cover in my previous
-&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/&#34;&gt;tutorial on Emscripten and SDL2&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/&#34;&gt;tutorial on Emscripten and SDL2&lt;/a&gt;,
 is how to somehow get the image data from the &lt;code&gt;HTMLImageElement&lt;/code&gt; to be
 accessible from the Emscripten compiled C program.&lt;/p&gt;
 
@@ -76,7 +76,7 @@ the function&lt;/p&gt;
 
 &lt;p&gt;which reads the memory referred to by &lt;code&gt;SDL_RWops&lt;/code&gt; and gives us a SDL_Surface
 pointer that we can turn into a texture and render in the
-&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;usual way&lt;/a&gt;.&lt;/p&gt;
+&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;usual way&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;span id=&#34;load_image_section&#34;&gt;
 In code, the C function for changing the image will look something like this:
@@ -140,7 +140,7 @@ data as an array of unsigned 32 bit integers.&lt;/p&gt;
 
 &lt;p&gt;Typed arrays can be passed C side by the Emscripten provided JavaScript
 functions &lt;code&gt;ccall&lt;/code&gt; and &lt;code&gt;cwrap&lt;/code&gt;. I&amp;rsquo;ve discussed &lt;code&gt;ccall&lt;/code&gt;
-&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/#ccall_section&#34;&gt;before&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/#ccall_section&#34;&gt;before&lt;/a&gt;,
 &lt;code&gt;cwrap&lt;/code&gt; is similar, but returns a JavaScript function that can be used for calling
 the &amp;lsquo;wrapped&amp;rsquo; C function rather than calling it directly. If a C function
 &lt;code&gt;void print_array(void *a)&lt;/code&gt; has been exported when Emscripten was compiled, a
@@ -195,9 +195,9 @@ unsigned 8-bit integers in JavaScript and print them in the C program.&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/print_array.html&#34;&gt;print_array.html&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/print_array.tar.gz&#34;&gt;print_array.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/print_array.zip&#34;&gt;print_array.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/print_array.html&#34;&gt;print_array.html&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/print_array.tar.gz&#34;&gt;print_array.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/print_array.zip&#34;&gt;print_array.zip&lt;/a&gt;]&lt;/p&gt;
 
 &lt;p&gt;As a next step, let&amp;rsquo;s put these ideas to work through the task of printing
 &amp;lsquo;hello world&amp;rsquo; via passing an array of C characters (or, equivalently, an array
@@ -344,12 +344,12 @@ the context is kept in a virtual scope it is persistent and available after this
 initialising function is called and for every subsequent call of &lt;code&gt;load_image&lt;/code&gt;.
 See the source code below for details&amp;hellip;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;
-&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/basic_image_viewer_screen_shot.png&#34; alt=&#34;basic image viewer screenshot&#34;&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/basic_image_viewer_screen_shot.png&#34; alt=&#34;basic image viewer screenshot&#34;&gt;
 &lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;show_img.html&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/show_img.tar.gz&#34;&gt;show_img.tar.gz&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/show_img.zip&#34;&gt;show_img.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/show_img.html&#34;&gt;show_img.html&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/show_img.tar.gz&#34;&gt;show_img.tar.gz&lt;/a&gt;, &lt;a href=&#34;https://lyceum-allotments.github.io/code/show_img.zip&#34;&gt;show_img.zip&lt;/a&gt;]&lt;/p&gt;
 
 &lt;h2 id=&#34;wrapping-it-all-up&#34;&gt;Wrapping It All Up&lt;/h2&gt;
 
@@ -520,12 +520,12 @@ encapsulated, there is nothing to stop an &lt;code&gt;ImgViewer&lt;/code&gt; bei
 given a different &lt;code&gt;canvas&lt;/code&gt; element and voila, with no effort you have two image
 viewers on one page! See the example and source code below for details:&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;
-&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/double_image_viewer_screen_shot.png&#34; alt=&#34;double image viewer screenshot&#34;&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/double_image_viewer_screen_shot.png&#34; alt=&#34;double image viewer screenshot&#34;&gt;
 &lt;/a&gt;
-[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;img_viewer.html&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/img_viewer.tar.gz&#34;&gt;img_viewer.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/img_viewer.zip&#34;&gt;img_viewer.zip&lt;/a&gt;]&lt;/p&gt;
+[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/img_viewer/img_viewer.html&#34;&gt;img_viewer.html&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/img_viewer.tar.gz&#34;&gt;img_viewer.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/img_viewer.zip&#34;&gt;img_viewer.zip&lt;/a&gt;]&lt;/p&gt;
 
 &lt;h2 id=&#34;the-final-product&#34;&gt;The Final Product&lt;/h2&gt;
 
@@ -533,25 +533,25 @@ viewers on one page! See the example and source code below for details:&lt;/p&gt
 must be listened to and converted into manipultions of the &lt;code&gt;SDL_Texture&lt;/code&gt;
 containing the image. There is nothing specific to Emscripten here except for
 the calling of &lt;code&gt;emscripten_set_main_loop&lt;/code&gt; rather than having a main animation
-loop, as described &lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+loop, as described &lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Links to an example page using the &lt;code&gt;ImgViewer&lt;/code&gt; and to the github repository
 containing the &lt;code&gt;ImgViewer&lt;/code&gt; library are included below.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
-&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/complete_image_viewer_screen_shot.png&#34; alt=&#34;complete image viewer screenshot&#34;&gt;
 &lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;newsham_park.html&lt;/a&gt;, &lt;a href=&#34;https://github.com/lyceum-allotments/img_viewer&#34;&gt;img_viewer_repository&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/newsham_park/newsham_park.html&#34;&gt;newsham_park.html&lt;/a&gt;, &lt;a href=&#34;https://github.com/lyceum-allotments/img_viewer&#34;&gt;img_viewer_repository&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL 2 Tutorial Part 1</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:07 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/</guid>
       <description>&lt;p&gt;&lt;a href=&#34;https://kripken.github.io/emscripten-site/&#34;&gt;Emscripten&lt;/a&gt;
  is a compiler that allows you to take standard C/C++ and compile it
 to JavaScript, making it possible to port your C/C++ programs and run them in
@@ -561,8 +561,8 @@ image, moving an image and listening for user input, and enabling you to make a
 game like this example of &amp;lsquo;snake&amp;rsquo; with relative ease in C/C++, all without
 writing a single line of JavaScript.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/pages/snake.html&#34;&gt;
-&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/snake_screen_shot.png&#34; alt=&#34;snake screenshot&#34;&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/pages/snake.html&#34;&gt;
+&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/snake_screen_shot.png&#34; alt=&#34;snake screenshot&#34;&gt;
 &lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;The tutorial is broken into the following stages, that take you from an
@@ -570,25 +570,25 @@ introduction into what Emscripten does to making a customised web-site to host
 your application:&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/&#34;&gt;&lt;strong&gt;Introduction to LLVM, Emscripten and asm.js&lt;/strong&gt;&lt;/a&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/&#34;&gt;&lt;strong&gt;Introduction to LLVM, Emscripten and asm.js&lt;/strong&gt;&lt;/a&gt;
 &amp;ndash; a discussion of the various tools that will be used and how they work together&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Hello World&lt;/strong&gt;&lt;/a&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Hello World&lt;/strong&gt;&lt;/a&gt;
 &amp;ndash; the Emscripten compiler is downloaded and the classic hello world program written and compiled&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;&lt;strong&gt;Look, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; the SDL2 media library is used with Emscripten to display a
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/&#34;&gt;&lt;strong&gt;Look, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; the SDL2 media library is used with Emscripten to display a
 delightful image of an owl&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;&lt;strong&gt;Move, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; upping the complexity level and moving the owl depending on
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/&#34;&gt;&lt;strong&gt;Move, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; upping the complexity level and moving the owl depending on
 user input&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/&#34;&gt;&lt;strong&gt;Write Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; using the SDL2_TTF font rendering library to put some text
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/&#34;&gt;&lt;strong&gt;Write Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; using the SDL2_TTF font rendering library to put some text
 into the scene&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/&#34;&gt;&lt;strong&gt;Get Naked, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; making some final tweaks to the presentation of our
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/&#34;&gt;&lt;strong&gt;Get Naked, Owl&lt;/strong&gt;&lt;/a&gt; &amp;ndash; making some final tweaks to the presentation of our
 application&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/&#34;&gt;&lt;strong&gt;Making Something Practical&lt;/strong&gt;&lt;/a&gt;&amp;ndash; a bigger project, a game of snake, is
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/&#34;&gt;&lt;strong&gt;Making Something Practical&lt;/strong&gt;&lt;/a&gt;&amp;ndash; a bigger project, a game of snake, is
 discussed and issues surrounding bigger projects addressed&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -599,10 +599,10 @@ the brave new world of transpiling C/C++ into JavaScript!&lt;/p&gt;
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 2: Introduction to LLVM, Emscripten and asm.js</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:06 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/</guid>
       <description>&lt;p&gt;JavaScript is a remarkable language, cobbled together in 10 days in 1995 and
 intended to be a forgiving language to enable simple pieces of interactivity to
 be incorporated into web pages, it now finds itself implemented in every
@@ -685,16 +685,16 @@ the client&amp;rsquo;s native graphics drivers if the brower supports it.&lt;/p&
 run and start off the same way that any adventure in silicon tends to start, by
 corralling Emscripten to say &amp;lsquo;hello world&amp;rsquo;.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Part 3: Hello World&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/&#34;&gt;&lt;strong&gt;Part 3: Hello World&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 3: Hello World</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:05 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/</guid>
       <description>&lt;p&gt;The Emscripten SDK containing the Emscripten compiler can be downloaded
 &lt;a href=&#34;https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html&#34;&gt;here&lt;/a&gt;.
 On Linux and MacOS some dependencies need to be installed prior to installing
@@ -737,8 +737,8 @@ classic &amp;lsquo;Hello World&amp;rsquo; program will do the trick nicely:&lt;/
 &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
-[&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_world.tar.gz&#34;&gt;hello_world.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_world.zip&#34;&gt;hello_world.zip&lt;/a&gt;]&lt;/p&gt;
+[&lt;a href=&#34;https://lyceum-allotments.github.io/code/hello_world.tar.gz&#34;&gt;hello_world.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/hello_world.zip&#34;&gt;hello_world.zip&lt;/a&gt;]&lt;/p&gt;
 
 &lt;p&gt;Compile with the Emscripten C compiler with the following command:&lt;/p&gt;
 
@@ -764,16 +764,16 @@ pretty spectacular.&lt;/p&gt;
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 4: Look, Owl</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:04 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/</guid>
       <description>&lt;p&gt;Although you can do plenty of interesting things with just logic and text, to
 impress the man on the Clapham omnibus these days you generally need to do
 something graphical. To this end we&amp;rsquo;ll now write a program to load and show this
 fetching picture of an owl coughing up a pellet:&lt;/p&gt;
 
-&lt;p&gt;&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;http://lyceum-allotments.github.io/images/coughing_owl.png&#34; alt=&#34;couging owl&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img style=&#34;display:block;margin-left:auto;margin-right:auto&#34; src=&#34;https://lyceum-allotments.github.io/images/coughing_owl.png&#34; alt=&#34;couging owl&#34;&gt;&lt;/p&gt;
 
 &lt;p&gt;Solving this problem can be broken down into two broad stages: firstly how do we
 refer to the image of an owl stored on a server&amp;rsquo;s file system when it
@@ -895,17 +895,17 @@ function &lt;code&gt;IMG_Load&lt;/code&gt; to load an image file (loaded from th
 system) and copies that to a renderer that is then used to display the image to
 the screen using SDL2 functions.&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_owl.tar.gz&#34;&gt;hello_owl.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/hello_owl.zip&#34;&gt;hello_owl.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/code/hello_owl.tar.gz&#34;&gt;hello_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/hello_owl.zip&#34;&gt;hello_owl.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 5: Move, Owl</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:03 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/</guid>
       <description>&lt;p&gt;We can now use SDL2 to load and display an image. The next step is to learn how
 to move this image, and then to use SDL&amp;rsquo;s functions to listen for user input in
 order to control the movement.&lt;/p&gt;
@@ -1070,8 +1070,8 @@ it until it equals 100 at which point the looping is stopped:&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/code/loop_test.tar.gz&#34;&gt;loop_test.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/loop_test.zip&#34;&gt;loop_test.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/code/loop_test.tar.gz&#34;&gt;loop_test.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/loop_test.zip&#34;&gt;loop_test.zip&lt;/a&gt;]&lt;/p&gt;
 
 &lt;p&gt;This example can be simply altered to illustrate the effect of the
 &lt;code&gt;simulate_infinite_loop&lt;/code&gt; argument given to &lt;code&gt;emscripten_set_main_loop_arg&lt;/code&gt;. When it
@@ -1093,17 +1093,17 @@ that the owl image is rendered into is moved.&lt;/p&gt;
 
 &lt;p&gt;An example implementing this can be seen and source-code downloaded below:&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/move_owl.html&#34;&gt;move_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/move_owl.tar.gz&#34;&gt;move_owl.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/move_owl.zip&#34;&gt;move_owl.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/move_owl.html&#34;&gt;move_owl.html&lt;/a&gt;, &lt;a href=&#34;https://lyceum-allotments.github.io/code/move_owl.tar.gz&#34;&gt;move_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/move_owl.zip&#34;&gt;move_owl.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 6: Write Owl</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:02 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/</guid>
       <description>&lt;p&gt;One final component of a game that I will cover in this tutorial is text.
 Having a look at the available Emscripten ports (&lt;code&gt;emcc --show-ports&lt;/code&gt;) will
 reveal a library called &lt;a href=&#34;https://www.libsdl.org/projects/SDL_ttf/&#34;&gt;SDL2_ttf&lt;/a&gt; is
@@ -1149,17 +1149,17 @@ render, and fg is the colour you want it rendered in. This surface is then just
 made into a texture and rendered in same way as we did for the previous owl
 image. See the soure code below for details!&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/write_owl.html&#34;&gt;write_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/write_owl.tar.gz&#34;&gt;write_owl.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/write_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/write_owl.html&#34;&gt;write_owl.html&lt;/a&gt;, &lt;a href=&#34;https://lyceum-allotments.github.io/code/write_owl.tar.gz&#34;&gt;write_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/write_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:01 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/</guid>
       <description>&lt;p&gt;We&amp;rsquo;re so close to being able to make the perfect game you can almost taste it,
 there&amp;rsquo;s just a few things in our way &amp;ndash; all that &amp;lsquo;powered by Emscripten&amp;rsquo; gumpf
 that associates itself with or masterwork every time we get Emscripten to
@@ -1326,17 +1326,17 @@ argument to refer to a file with a &lt;code&gt;.js&lt;/code&gt; subscript, like 
 &lt;p&gt;Source code implementing these ideas and a page showing their effect is included
 below:&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/naked_owl.html&#34;&gt;naked_owl.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/naked_owl.tar.gz&#34;&gt;naked_owl.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/naked_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/naked_owl.html&#34;&gt;naked_owl.html&lt;/a&gt;, &lt;a href=&#34;https://lyceum-allotments.github.io/code/naked_owl.tar.gz&#34;&gt;naked_owl.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/naked_owl.zip&#34;&gt;write_owl.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Emscripten and SDL2 Tutorial Part 8: Making Something Practical</title>
-      <link>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</link>
+      <link>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:00 +0100</pubDate>
       
-      <guid>http://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</guid>
+      <guid>https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/</guid>
       <description>&lt;p&gt;At long last we&amp;rsquo;ve reached a position where we can make a 2D game that is
 something like fully functional. As an illustration I&amp;rsquo;ve made a simple version
 of Snake, which can act as a guide for any projects that you&amp;rsquo;d like to do.&lt;/p&gt;
@@ -1357,8 +1357,8 @@ size 67108864 bytes (that is, 2^26 bytes) will be used, which should be enough.&
 to pass the &lt;code&gt;emcc&lt;/code&gt; command line argument &lt;code&gt;-s ALLOW_MEMORY_GROWTH=1&lt;/code&gt; which allows
 the memory array to grow if needs be, but this involves a performance cost.&lt;/p&gt;
 
-&lt;p&gt;[&lt;a href=&#34;http://lyceum-allotments.github.io/pages/snake.html&#34;&gt;snake.html&lt;/a&gt;, &lt;a href=&#34;http://lyceum-allotments.github.io/code/snake.tar.gz&#34;&gt;snake.tar.gz&lt;/a&gt;,
-&lt;a href=&#34;http://lyceum-allotments.github.io/code/snake.zip&#34;&gt;snake.zip&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;[&lt;a href=&#34;https://lyceum-allotments.github.io/pages/snake.html&#34;&gt;snake.html&lt;/a&gt;, &lt;a href=&#34;https://lyceum-allotments.github.io/code/snake.tar.gz&#34;&gt;snake.tar.gz&lt;/a&gt;,
+&lt;a href=&#34;https://lyceum-allotments.github.io/code/snake.zip&#34;&gt;snake.zip&lt;/a&gt;]&lt;/p&gt;
 </description>
     </item>
     

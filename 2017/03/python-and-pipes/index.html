@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Python and Pipes</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16-DEV" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="https://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="https://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="https://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="https://lyceum-allotments.github.io/img/lyceum_allotments.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes/">Python and Pipes</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		<p>I&rsquo;ve been working a bit with pipes in Python, using the
+<a href="https://docs.python.org/2/library/subprocess.html"><code>subprocess</code></a> module to
+kick off a couple of processes, a client and a server, and using pipes to
+redirect their input and output in such a way as to test them. I thought it
+might be an idea to write about using pipes primarily from a Python viewpoint,
+with a view especially to clarifying things like blocking and buffering.</p>
+
+<p>In the course of this tutorial we will develop a testing tool for a pair of
+programs. This tool will be able to start both programs, issue some commands to
+both of them and then source its input from named pipes, allowing the user to
+enter their own commands as and when they see fit. The output will be provided
+via <code>stdout</code> and will be the multiplexed output of both prgrams, prefixed with
+an appropriate identifying prefix. A typical use case of this testing tool (and
+what I am using it for) is testing a client and server, by which I need to fire
+up both client and server, automate the entry of some configuration commands
+and then have manual control to enter more commands to both client and server.</p>
+
+<p>The tutorial is broken into the following pieces:</p>
+
+<ul>
+<li><a href="/2017/03/python-and-pipes-part-2-introduction-to-unix-pipes/"><strong>Introduction to Unix Pipes</strong></a>
+&ndash; a brief introduction to Unix named pipes in general, and how to use them</li>
+<li><a href="/2017/03/python-and-pipes-part-3-pipes-in-python/"><strong>Pipes in Python</strong></a>
+&ndash; Python is used to write and read from pipes</li>
+<li><a href="/2017/03/python-and-pipes-part-4-on-the-buffers/"><strong>On the Buffers</strong></a>
+&ndash; looking at the effect of buffering in reading and writing from pipes, writing
+a program that sends a message letter by letter and line by line</li>
+<li><a href="/2017/03/python-and-pipes-part-5-subprocesses-and-pipes/"><strong>Subrocesses and pipes</strong></a>
+&ndash; where a subprocess is spawned in Python and the input and output redirected
+and manipulated to our heart&rsquo;s content</li>
+<li><a href="/2017/03/python-and-pipes-part-6-multiple-subprocesses-and-pipes/"><strong>Multiple subprocesses and pipes</strong></a>
+&ndash; the fully-fledged testing tool is developed, a program that spawns two
+subprocesses, and redirects the inputs and outputs to four pipes</li>
+</ul>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

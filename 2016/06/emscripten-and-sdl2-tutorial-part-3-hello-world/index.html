@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>Emscripten and SDL2 Tutorial Part 3: Hello World</title>
 		<meta name="author" content="John Sharp">
-		<meta name="generator" content="Hugo 0.16" />
+		<meta name="generator" content="Hugo 0.16-DEV" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
@@ -90,7 +90,7 @@ a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and
 following commands which fetch the latest online tools from the web, installs
 them, and makes them active:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">update</span> 
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">update</span> 
 <span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">latest</span>
 <span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk</span> <span style="color: #f8f8f2">activate</span> <span style="color: #f8f8f2">latest</span>
 </pre></div>
@@ -99,7 +99,7 @@ them, and makes them active:</p>
 <p>Linux and MacOS X require a further step to set the system path to the active
 version of Emscripten:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">source</span> <span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk_env.sh</span>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">source</span> <span style="color: #f8f8f2">.</span><span style="color: #f92672">/</span><span style="color: #f8f8f2">emsdk_env.sh</span>
 </pre></div>
 
 
@@ -112,7 +112,7 @@ reference the whole path whenever you want to invoke the compiler.</p>
 program and compile it to JavaScript. The standard C implementation of the
 classic &lsquo;Hello World&rsquo; program will do the trick nicely:</p>
 
-<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
 
 <span style="color: #66d9ef">int</span> <span style="color: #a6e22e">main</span><span style="color: #f8f8f2">()</span>
 <span style="color: #f8f8f2">{</span>
@@ -126,9 +126,9 @@ classic &lsquo;Hello World&rsquo; program will do the trick nicely:</p>
 
 <p>Compile with the Emscripten C compiler with the following command:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">hello_world.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_world.html</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">hello_world.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_world.html</span>
 </pre></div>
-
+</p>
 
 <p>and you should get the files <code>hello_world.html</code> and <code>hello_world.js</code> appearing
 in your working directory. <code>hello_world.js</code> is the guts of your program, the

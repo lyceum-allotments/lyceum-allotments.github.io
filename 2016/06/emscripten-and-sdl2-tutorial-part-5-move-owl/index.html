@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>Emscripten and SDL2 Tutorial Part 5: Move, Owl</title>
 		<meta name="author" content="John Sharp">
-		<meta name="generator" content="Hugo 0.16" />
+		<meta name="generator" content="Hugo 0.16-DEV" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
@@ -89,7 +89,7 @@ occassions you typically have a main event loop and inside that main loop you
 increment the position of the image a small amount on each iteration, something
 like this:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">/**</span>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e">/**</span>
 <span style="color: #75715e"> * Initialise SDL and open window and renderer here</span>
 <span style="color: #75715e"> */</span>
 
@@ -153,9 +153,9 @@ browser periodically so that other things can be done. The one we will use here
 is <a href="https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_set_main_loop_arg"><code>emscripten_set_main_loop_arg</code></a>,
 defined in the header file <code>emscripten.h</code>:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_set_main_loop_arg(em_arg_callback_func</span> <span style="color: #f8f8f2">func,</span> <span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">arg,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">fps,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">simulate_infinite_loop)</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_set_main_loop_arg(em_arg_callback_func</span> <span style="color: #f8f8f2">func,</span> <span style="color: #66d9ef">void</span> <span style="color: #f92672">*</span><span style="color: #f8f8f2">arg,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">fps,</span> <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">simulate_infinite_loop)</span>
 </pre></div>
-
+</p>
 
 <p>Here, <code>func</code> is a function pointer to a function taking a void pointer as an
 argument, <code>arg</code> is the void pointer that will be passed as an argument, <code>fps</code> is the
@@ -175,9 +175,9 @@ faster than the browser, in general, it is a good idea to do this.</p>
 <p>To get out of the main loop, Emscripten provides the function
 <a href="https://kripken.github.io/emscripten-site/docs/api_reference/emscripten.h.html#c.emscripten_cancel_main_loop"><code>emscripten_cancel_main_loop</code></a>:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_cancel_main_loop(</span><span style="color: #66d9ef">void</span><span style="color: #f8f8f2">)</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">void</span> <span style="color: #f8f8f2">emscripten_cancel_main_loop(</span><span style="color: #66d9ef">void</span><span style="color: #f8f8f2">)</span>
 </pre></div>
-
+</p>
 
 <p>which when called will simply stop the main loop looping. It&rsquo;s important to note
 though, that the loop handler will not return.</p>
@@ -186,7 +186,7 @@ though, that the loop handler will not return.</p>
 <code>emscripten_canel_main_loop</code> to pass an integer to a loop function and increment
 it until it equals 100 at which point the looping is stopped:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e">#include</span> <span style="color: #75715e">&lt;stdio.h&gt;</span>
 
 <span style="color: #75715e">/**</span>
 <span style="color: #75715e"> * Provides emscripten_set_main_loop_arg and emscripten_cancel_main_loop</span>
@@ -241,7 +241,7 @@ it until it equals 100 at which point the looping is stopped:</p>
     <span style="color: #f8f8f2">printf(</span><span style="color: #e6db74">&quot;quitting...</span><span style="color: #ae81ff">\n</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">);</span>
 <span style="color: #f8f8f2">}</span>
 </pre></div>
-
+</p>
 
 <p>[<a href="/code/loop_test.tar.gz">loop_test.tar.gz</a>,
 <a href="/code/loop_test.zip">loop_test.zip</a>]</p>

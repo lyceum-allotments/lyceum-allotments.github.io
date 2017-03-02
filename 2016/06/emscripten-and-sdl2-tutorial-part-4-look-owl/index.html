@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>Emscripten and SDL2 Tutorial Part 4: Look, Owl</title>
 		<meta name="author" content="John Sharp">
-		<meta name="generator" content="Hugo 0.16" />
+		<meta name="generator" content="Hugo 0.16-DEV" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
@@ -108,10 +108,10 @@ program from. You can then tell Emscripten to embed the files inside this
 directory by passing the <code>--embed-file &lt;directory&gt;</code> command-line argument to
 emcc at compilation.</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>    <span style="color: #f8f8f2">hello_owl</span>
-    <span style="color: #960050; background-color: #1e0010">│</span>   
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%">    <span style="color: #f8f8f2">hello_owl</span>
+    <span style="color: #960050; background-color: #1e0010">│  </span> 
     <span style="color: #960050; background-color: #1e0010">├──</span> <span style="color: #f8f8f2">hello_owl.c</span>
-    <span style="color: #960050; background-color: #1e0010">│</span>   
+    <span style="color: #960050; background-color: #1e0010">│  </span> 
     <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">assets</span>
         <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">images</span>
             <span style="color: #960050; background-color: #1e0010">└──</span> <span style="color: #f8f8f2">owl.png</span>
@@ -121,7 +121,7 @@ emcc at compilation.</p>
 <p>Take as an example this file hierarchy, if we are in the <code>hello_owl</code> directory
 and we compile <code>hello_owl.c</code> with the command:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">embed</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">embed</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
 </pre></div>
 
 
@@ -129,7 +129,7 @@ and we compile <code>hello_owl.c</code> with the command:</p>
 compiled into the <code>hello_owl.js</code> JavaScript script. <code>hello_world.c</code> could now open
 the file in the same way a native C/C++ program would by calling something like:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">FILE</span> <span style="color: #f92672">*</span> <span style="color: #f8f8f2">fp</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">fopen(</span><span style="color: #e6db74">&quot;assets/images/owl.png&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">);</span>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">FILE</span> <span style="color: #f92672">*</span> <span style="color: #f8f8f2">fp</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">fopen(</span><span style="color: #e6db74">&quot;assets/images/owl.png&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">);</span>
 </pre></div>
 
 
@@ -144,7 +144,7 @@ and the virtual filesystem has been set up.</p>
 this method is known as preloading the files and you would compile <code>hello_owl.c</code>
 with the following command:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
 </pre></div>
 
 
@@ -176,9 +176,9 @@ argument <code>-s</code> followed by the appropriate port argument they can be a
 from within your code. A list of ports and their corresponding names can be acquired
 with the command:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">show</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">ports</span>
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">emcc</span> <span style="color: #f92672">--</span><span style="color: #f8f8f2">show</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">ports</span>
 </pre></div>
-
+</p>
 
 <p>Doing this, we can see that Emscripten ports provides the SDL2 library and the
 SDL2_image library and these are accessible by using the arguments <code>-s
@@ -191,10 +191,10 @@ the command <code>-s SDL2_IMAGE_FORMATS='[&quot;png&quot;]'</code> at compilatio
 compilation command for a program that can load png images from a virtual
 filesystem using the SDL2 library:</p>
 
-<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">hello_owl.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">O2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_IMAGE</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">SDL2_IMAGE_FORMATS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;png&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> \
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">emcc</span> <span style="color: #f8f8f2">hello_owl.c</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">O2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">USE_SDL_IMAGE</span><span style="color: #f92672">=</span><span style="color: #ae81ff">2</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">s</span> <span style="color: #f8f8f2">SDL2_IMAGE_FORMATS</span><span style="color: #f92672">=</span><span style="color: #960050; background-color: #1e0010">&#39;</span><span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;png&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #960050; background-color: #1e0010">&#39;</span> \
     <span style="color: #f92672">--</span><span style="color: #f8f8f2">preload</span><span style="color: #f92672">-</span><span style="color: #f8f8f2">file</span> <span style="color: #f8f8f2">assets</span> <span style="color: #f92672">-</span><span style="color: #f8f8f2">o</span> <span style="color: #f8f8f2">hello_owl.html</span>
 </pre></div>
-
+</p>
 
 <p>Now that we have the compilation command, all that remains for us to do is
 actually write the program!</p>

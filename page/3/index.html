@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>The Lyceum Allotments</title>
 		<meta name="author" content="John Sharp">
-		<meta name="generator" content="Hugo 0.16" />
+		<meta name="generator" content="Hugo 0.16-DEV" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
@@ -67,14 +67,89 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/">Emscripten and SDL2 Tutorial Part 8: Making Something Practical</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/">Emscripten and SDL2 Tutorial Part 2: Introduction to LLVM, Emscripten and asm.js</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			At long last we&rsquo;ve reached a position where we can make a 2D game that is something like fully functional. As an illustration I&rsquo;ve made a simple version of Snake, which can act as a guide for any projects that you&rsquo;d like to do. It doesn&rsquo;t really cover anything conceptually new that we haven&rsquo;t covered before, there&rsquo;s just more of it, with multiple source files to be compiled. One problem that will be encountered if you just try and compile it using the previous command is that when you try and run the program you&rsquo;ll be told that you&rsquo;ve run out of memory.
+			JavaScript is a remarkable language, cobbled together in 10 days in 1995 and intended to be a forgiving language to enable simple pieces of interactivity to be incorporated into web pages, it now finds itself implemented in every graphical web-browser and the natural choice for writing client-side web-apps that run anywhere that will run a browser. Rather like a drunken tattoo of Baphomet acquired at a time when you&rsquo;d no idea you would later wish to join the clergy, the issue now is how to deal with the consequences of this unforseeable unfortunate choice.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/">Emscripten and SDL2 Tutorial Part 3: Hello World</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			The Emscripten SDK containing the Emscripten compiler can be downloaded here. On Linux and MacOS some dependencies need to be installed prior to installing the compiler, details of these and instructions for their installation can be found here but after those are dealt with the installlation of Emscripten itself is quite straightforward; if you&rsquo;re using the portable SDK it&rsquo;s a case of unzipping it in a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and running the following commands which fetch the latest online tools from the web, installs them, and makes them active: ./emsdk update ./emsdk install latest ./emsdk activate latest Linux and MacOS X require a further step to set the system path to the active version of Emscripten: source ./emsdk_env.sh If all this has worked as it should, you should have the Emscripten compiler, emcc, at the file path ./emscripten/master/emcc in the emsdk_portable directory you downloaded.
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-4-look-owl/">Emscripten and SDL2 Tutorial Part 4: Look, Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			Although you can do plenty of interesting things with just logic and text, to impress the man on the Clapham omnibus these days you generally need to do something graphical. To this end we&rsquo;ll now write a program to load and show this fetching picture of an owl coughing up a pellet: Solving this problem can be broken down into two broad stages: firstly how do we refer to the image of an owl stored on a server&rsquo;s file system when it will be viewed in a web-page visited from the client&rsquo;s computer where JavaScript runs in a sandboxed environment?
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<br>
+
+<div class="row">
+	<div class="twelve column">
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/">Emscripten and SDL2 Tutorial Part 5: Move, Owl</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
+			We can now use SDL2 to load and display an image. The next step is to learn how to move this image, and then to use SDL&rsquo;s functions to listen for user input in order to control the movement. Moving the image turns out to be one of those things that needs to be done a little differently to how it is normally done in native C/C++ programs. On those occassions you typically have a main event loop and inside that main loop you increment the position of the image a small amount on each iteration, something like this: /** * Initialise SDL and open window and renderer here */ bool carry_on = true; SDL_Surface *image = IMG_Load(&quot;assets/owl.png&quot;); SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, image); int x = 0; /** * Have an infinite loop...
 		</p>
 	</div>
 </div>
@@ -96,6 +171,8 @@ ga('send', 'pageview');
 			
 			<a href="/page/2/" class="arrow-link"><i class="fa fa-arrow-circle-left fa-2x"></i></a>
 			
+			
+			<a href="/page/4/" class="arrow-link"><i class="fa fa-arrow-circle-right fa-2x"></i></a>
 			
 		</center>
 	</div>

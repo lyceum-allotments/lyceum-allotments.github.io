@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>The Lyceum Allotments</title>
 		<meta name="author" content="John Sharp">
-		<meta name="generator" content="Hugo 0.16" />
+		<meta name="generator" content="Hugo 0.16-DEV" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
@@ -67,20 +67,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/">Emscripten Image Viewer</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-6-multiple-subprocesses-and-pipes/">Python and Pipes Part 6: Multiple Subprocesses and Pipes</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Recently I&rsquo;ve ben playing around with developing a zoomable and panning image viewer using Emscripten and its proved to be a good exercise in accessing parts of the page&rsquo;s HTML document outside of the Emscripten run-time. The end goal is to provide a JavaScript API to an image viewer, consisting of an ImgViewer object and a single method: ImgViewer(image, canvas) &ndash; sets up the viewer to use the HTMLCanvasElement, canvas and show a pannable and zoomable copy of the HTMLImageElement, image ImgViewer.changeImage(image) &ndash; changes the image shown by the image viewer to the HTMLImageElement, image The main bit of ground here that I didn&rsquo;t cover in my previous tutorial on Emscripten and SDL2, is how to somehow get the image data from the HTMLImageElement to be accessible from the Emscripten compiled C program.
+			In the previous section we explored start a subprocess and controlling its input and output via pipes. In this section we&rsquo;ll do the same, but this time for two sub-processes. A use for this, and the original reason I first developed this, was for testing a client and server. Basically, I wanted a program to start up the client and the server, to provide a set of pre-scripted commands to each to get them in a certain state, and then a way of providing my own custom commands, to do some interactive testing.
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Aug 03, 2016</span>
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -92,20 +92,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/">Emscripten and SDL 2 Tutorial Part 1</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-5-subprocesses-and-pipes/">Python and Pipes Part 5: Subprocesses and Pipes</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Emscripten is a compiler that allows you to take standard C/C++ and compile it to JavaScript, making it possible to port your C/C++ programs and run them in any modern browser. This tutorial series aims to be your guide and lead you to using the SDL2 library to implement all the basic components of a 2D game; showing an image, moving an image and listening for user input, and enabling you to make a game like this example of &lsquo;snake&rsquo; with relative ease in C/C++, all without writing a single line of JavaScript.
+			The Python subprocess module (used for starting subprocesses) is one module that provides scope for heavy usage of pipes. Here we&rsquo;ll look at this module and how you can use pipes to manipulate the input and output of the spawned subprocess. A Crash Course in the subprocess Module Let&rsquo;s have a program, for example the Python program detailed below that queries a person for their name and then echos it with a greeting (note this example is a Python program, but we can, in principle, use any program) # say_my_name.py import sys print &quot;what&#39;s your name?&quot; for name in iter(sys.stdin.readline, &#39;&#39;): name = name[:-1] if name == &quot;exit&quot;: break print &quot;Well how do you do {0}?&quot;.format(name) print &quot;what&#39;s your name?&quot; This program can be started from within a separate Python process by using the subprocess module, like so: # run_say_my_name.py import subprocess import sys proc = subprocess.Popen([&quot;python&quot;, &quot;say_my_name.py&quot;]) while proc.returncode is None: proc.poll() subprocess.Popen creates a Popen object and kicks off a subprocess similar to the one that would be started by typing python say_my_name.py at a command prompt.
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -117,20 +117,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-2-introduction-to-llvm-emscripten-and-asm.js/">Emscripten and SDL2 Tutorial Part 2: Introduction to LLVM, Emscripten and asm.js</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-4-on-the-buffers/">Python and Pipes Part 4: On the Buffers</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			JavaScript is a remarkable language, cobbled together in 10 days in 1995 and intended to be a forgiving language to enable simple pieces of interactivity to be incorporated into web pages, it now finds itself implemented in every graphical web-browser and the natural choice for writing client-side web-apps that run anywhere that will run a browser. Rather like a drunken tattoo of Baphomet acquired at a time when you&rsquo;d no idea you would later wish to join the clergy, the issue now is how to deal with the consequences of this unforseeable unfortunate choice.
+			In the last section we looked at sending a message through a pipe and everything worked great. However there was a porblem, and this becomes apparent if we alter the sending program and make it run a little slower, perhaps by adding a short sleep in between sending each letter of the message, something like this: import time message = &quot;hello to a pipe\n&quot; with open(&quot;my_pipe&quot;, &quot;w&quot;) as f: print &quot;have opened pipe, commencing writing....&quot; for c in message: f.write(c) print &quot;have sent a letter&quot; time.sleep(1) if we run this program and attempt to read from my_pipe in a different virtual terminal with cat my_pipe we&rsquo;ll see that we need to show a bit of patience!
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -142,20 +142,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-3-hello-world/">Emscripten and SDL2 Tutorial Part 3: Hello World</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-3-pipes-in-python/">Python and Pipes Part 3: Pipes in Python</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			The Emscripten SDK containing the Emscripten compiler can be downloaded here. On Linux and MacOS some dependencies need to be installed prior to installing the compiler, details of these and instructions for their installation can be found here but after those are dealt with the installlation of Emscripten itself is quite straightforward; if you&rsquo;re using the portable SDK it&rsquo;s a case of unzipping it in a convenient place, changing into the &lsquo;emsdk_portable&rsquo; directory and running the following commands which fetch the latest online tools from the web, installs them, and makes them active: ./emsdk update ./emsdk install latest ./emsdk activate latest Linux and MacOS X require a further step to set the system path to the active version of Emscripten: source ./emsdk_env.sh If all this has worked as it should, you should have the Emscripten compiler, emcc, at the file path ./emscripten/master/emcc in the emsdk_portable directory you downloaded.
+			In the previous section it was shown how pipes were represented in the operating system in Unix, and how they were written and read from in a way that was very much analagous to how ordinary files are. This is one of the major insights of the Unix family of operating systems, they make explicit the analogies between interprocess communication and ordinary input and output &ndash; if a program is made to operate based on the input of plain text and produce plain text as an output it does not matter about the origins of that input, be it a human with a keyboard, another program or even input travelling from across the world over the internet.
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">

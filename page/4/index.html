@@ -67,20 +67,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-2-introduction-to-unix-pipes/">Python and Pipes Part 2: Introduction to Unix Pipes</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-6-write-owl/">Emscripten and SDL2 Tutorial Part 6: Write Owl</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Pipes are one method of interprocess communication in the Unix world, the other being sockets. The differences are that pipes are more simple to set up and use but more narrow in scope. Pipes are unidirectional, having one writer and one reader, and operate on a &lsquo;first in first out&rsquo; (or FIFO) principle &ndash; i.e. the first bit of data you put in is the first you get out; if I put &lsquo;hello world&rsquo; into a pipe I will receive a &lsquo;h&rsquo; first and the &rsquo;d&rsquo; last.
+			One final component of a game that I will cover in this tutorial is text. Having a look at the available Emscripten ports (emcc --show-ports) will reveal a library called SDL2_ttf is at your disposal. This is a library that enables you render true type fonts into an SDL_Surface, that can then be rendered in a similar fashion to what we&rsquo;ve done previously. --show-ports tells us that the command line argument we need to pass to emcc is -s USE_SDL_TTF=2 so all we need to do is add that to our command line, giving us&hellip; emcc write_owl.c -O2 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=&#39;[&quot;png&quot;]&#39; \ -s USE_SDL2_TTF=2 --preload-file assets -o write_owl.html in our code we need to remember to include the SDL_TTF header file: #include &lt;SDL/SDL_ttf.h&gt; and then we can use the SDL_TTF functions to load a true type font (that we have uploaded to our virtual filesystem, like our image, by placing in a preloaded directory) using: TTF_Font *TTF_OpenFont(const char * file_path, int ptsize) where file_path is the path to the true type font in the virtual filesystem, and ptsize is the size of the font.
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -92,20 +92,20 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes/">Python and Pipes</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-7-get-naked-owl/">Emscripten and SDL2 Tutorial Part 7: Get Naked, Owl</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			I&rsquo;ve been working a bit with pipes in Python, using the subprocess module to kick off a couple of processes, a client and a server, and using pipes to redirect their input and output in such a way as to test them. I thought it might be an idea to write about using pipes primarily from a Python viewpoint, with a view especially to clarifying things like blocking and buffering. In the course of this tutorial we will develop a testing tool for a pair of programs.
+			We&rsquo;re so close to being able to make the perfect game you can almost taste it, there&rsquo;s just a few things in our way &ndash; all that &lsquo;powered by Emscripten&rsquo; gumpf that associates itself with or masterwork every time we get Emscripten to generate some HTML for us. That console might come in very useful when we were needing to debug things, but now we&rsquo;re convinced that our code is completely, absolutely, bug free and we don&rsquo;t need those crutches any more!
 		</p>
 	</div>
 </div>
 <div class="row">
 	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
+		<span class="post-postedby">posted by John Sharp on Jun 19, 2016</span>
 	</div>
 	<div class="three columns">
 		<span style="font-size:small;">
@@ -117,39 +117,14 @@ ga('send', 'pageview');
 
 <div class="row">
 	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/08/emscripten-image-viewer/">Emscripten Image Viewer</a>
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-8-making-something-practical/">Emscripten and SDL2 Tutorial Part 8: Making Something Practical</a>
 	</div>
 </div>
 
 <div class="row">
 	<div class="twelve columns">
 		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Recently I&rsquo;ve ben playing around with developing a zoomable and panning image viewer using Emscripten and its proved to be a good exercise in accessing parts of the page&rsquo;s HTML document outside of the Emscripten run-time. The end goal is to provide a JavaScript API to an image viewer, consisting of an ImgViewer object and a single method: ImgViewer(image, canvas) &ndash; sets up the viewer to use the HTMLCanvasElement, canvas and show a pannable and zoomable copy of the HTMLImageElement, image ImgViewer.changeImage(image) &ndash; changes the image shown by the image viewer to the HTMLImageElement, image The main bit of ground here that I didn&rsquo;t cover in my previous tutorial on Emscripten and SDL2, is how to somehow get the image data from the HTMLImageElement to be accessible from the Emscripten compiled C program.
-		</p>
-	</div>
-</div>
-<div class="row">
-	<div class="nine columns">
-		<span class="post-postedby">posted by John Sharp on Aug 03, 2016</span>
-	</div>
-	<div class="three columns">
-		<span style="font-size:small;">
-			
-		</span>
-	</div>
-</div>
-<br>
-
-<div class="row">
-	<div class="twelve column">
-		<a class="post-title-link" href="https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl-2-tutorial-part-1/">Emscripten and SDL 2 Tutorial Part 1</a>
-	</div>
-</div>
-
-<div class="row">
-	<div class="twelve columns">
-		<p style="padding-left:2px; margin-left:2px; padding-bottom:0px; margin-bottom:0px;">
-			Emscripten is a compiler that allows you to take standard C/C++ and compile it to JavaScript, making it possible to port your C/C++ programs and run them in any modern browser. This tutorial series aims to be your guide and lead you to using the SDL2 library to implement all the basic components of a 2D game; showing an image, moving an image and listening for user input, and enabling you to make a game like this example of &lsquo;snake&rsquo; with relative ease in C/C++, all without writing a single line of JavaScript.
+			At long last we&rsquo;ve reached a position where we can make a 2D game that is something like fully functional. As an illustration I&rsquo;ve made a simple version of Snake, which can act as a guide for any projects that you&rsquo;d like to do. It doesn&rsquo;t really cover anything conceptually new that we haven&rsquo;t covered before, there&rsquo;s just more of it, with multiple source files to be compiled. One problem that will be encountered if you just try and compile it using the previous command is that when you try and run the program you&rsquo;ll be told that you&rsquo;ve run out of memory.
 		</p>
 	</div>
 </div>
@@ -169,10 +144,8 @@ ga('send', 'pageview');
 	<div class="twelve columns">
 		<center>
 			
-			<a href="/" class="arrow-link"><i class="fa fa-arrow-circle-left fa-2x"></i></a>
+			<a href="/page/3/" class="arrow-link"><i class="fa fa-arrow-circle-left fa-2x"></i></a>
 			
-			
-			<a href="/page/3/" class="arrow-link"><i class="fa fa-arrow-circle-right fa-2x"></i></a>
 			
 		</center>
 	</div>

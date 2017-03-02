@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Python and Pipes Part 6: Multiple Subprocesses and Pipes</title>
+		<meta name="author" content="John Sharp">
+		<meta name="generator" content="Hugo 0.16-DEV" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/skeleton.css">
+		<link rel="stylesheet" href="https://lyceum-allotments.github.io/css/custom.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+		
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'abcde', 'auto');
+ga('send', 'pageview');
+</script>
+
+	</head>
+	<body class="color-scheme-light">
+		<div class="container" style="border-bottom: 0px solid #eee;">
+			<div class="row">
+				<div class="eight columns">
+                                        
+					<a href="https://lyceum-allotments.github.io" class="sitename"><span style="font-size: 36px; "><b>The Lyceum Allotments</b></span></a>
+                                        
+					
+					<span style="font-size: 14px;">|<i>John Sharp&#39;s blog</i></span>
+					
+				</div>
+				<div class="four columns" >
+					
+					
+					
+					
+					<a class="navbar-link" href="https://lyceum-allotments.github.io/">home</a>
+					
+					
+					
+					<a class="navbar-link" href="https://lyceum-allotments.github.io/series">series</a>
+					
+					
+					
+					<a class="navbar-rlink" href="https://github.com/lyceum-allotments/">code</a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="twelve columns" >
+                    <img class="u-max-full-width" src="https://lyceum-allotments.github.io/img/lyceum_allotments.png">
+				</div>
+			</div>
+
+
+
+<div class="row">
+	<div class="twelve columns">
+		<a class="post-title-link" href="https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-6-multiple-subprocesses-and-pipes/">Python and Pipes Part 6: Multiple Subprocesses and Pipes</a>
+	</div>
+</div>
+<div class="row">
+	<div class="nine columns">
+		<span class="post-postedby">posted by John Sharp on Mar 02, 2017</span>
+	</div>
+	<div class="three columns">
+		<span style="font-size:small;">
+			
+		</span>
+	</div>
+</div>
+<div class="row">
+	<div class="twelve columns">
+		
+
+<p>In the <a href="/2017/03/python-and-pipes-part-5-subprocesses-and-pipes/">previous
+section</a>
+we explored start a subprocess and controlling its input and output via
+pipes. In this section we&rsquo;ll do the same, but this time for two sub-processes.
+A use for this, and the original reason I first developed this, was for testing
+a client and server. Basically, I wanted a program to start up the client and
+the server, to provide a set of pre-scripted commands to each to get them in a
+certain state, and then a way of providing my own custom commands, to do some
+interactive testing.</p>
+
+<p>What we aim to end up with is a program that starts up two sub-processes, let&rsquo;s
+call them <code>A</code> and <code>B</code>, and connects to two named pipes in the file system. From
+these two pipes <code>A</code> and <code>B</code> will read their respective inputs. Output from both
+of the processes will be printed on <code>stdout</code>, but to enable us to differentiate
+which output comes from which process we&rsquo;ll prepend output from process <code>A</code> with
+an <code>A:</code> and from process <code>B</code> with a <code>B:</code>.</p>
+
+<h2 id="the-two-sub-processes:3d7f2b7fc46d7c825999d7e45bcc2804">The Two Sub-Processes</h2>
+
+<p>As an illustration of what can be achieved, the two sub-processes that we are
+going to spawn will be kept very simple, doing nothing more than printing a
+prompt, reading a line of input, echoing that back and prompting for more input:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># proc_a.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">sys</span>
+<span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;what should proc A say?&quot;</span>
+<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">iter(sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdin</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">readline,</span> <span style="color: #e6db74">&#39;&#39;</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">name[:</span><span style="color: #f92672">-</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">]</span>
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">==</span> <span style="color: #e6db74">&quot;exit&quot;</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #66d9ef">break</span>
+    <span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;Proc A says, </span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">{0}</span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">&quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">format(name)</span>
+    <span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;what should proc A say?&quot;</span>
+</pre></div>
+
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># proc_b.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">sys</span>
+<span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;what should proc B say?&quot;</span>
+<span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">iter(sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdin</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">readline,</span> <span style="color: #e6db74">&#39;&#39;</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">name[:</span><span style="color: #f92672">-</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">]</span>
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">==</span> <span style="color: #e6db74">&quot;exit&quot;</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #66d9ef">break</span>
+    <span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;Proc B says, </span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">{0}</span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">&quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">format(name)</span>
+    <span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;what should proc B say?&quot;</span>
+</pre></div>
+
+
+<p>A program to start both of these sub-processes and run them until
+either of them, or the mother process, finishes, looks pretty similar
+to the stuff we were doing with sub-processes in the previous section:
+all we have to do is two start two subprocesses rather than one and make
+sure we poll and check two return codes rather than one:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># two_subprocesses.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">subprocess</span>
+
+<span style="color: #75715e"># start both `proc_a.py` and `proc_b.py`</span>
+<span style="color: #f8f8f2">proc_a</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_a.py&quot;</span><span style="color: #f8f8f2">],</span> <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span>
+    <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+<span style="color: #f8f8f2">proc_b</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_b.py&quot;</span><span style="color: #f8f8f2">],</span> <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span>
+    <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+    <span style="color: #75715e"># check if either sub-process has finished</span>
+    <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+    <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None</span> <span style="color: #f92672">or</span> <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None:</span>
+        <span style="color: #66d9ef">break</span>
+</pre></div>
+
+
+<p>Note that both our subprocesses are opened with their <code>stdin</code>s and <code>stdout</code>s
+from internal pipes. This is necessary because we want to have control over
+their input and outputs since we have two inputs and outputs and only one mother
+process <code>stdin</code> and <code>stdout</code>. In order to avoid the two outputs becoming
+interleaved and two know what input to send to which child process we&rsquo;re going
+to have to do something clever&hellip;</p>
+
+<h2 id="non-blocking-outputs-the-power-of-threads:3d7f2b7fc46d7c825999d7e45bcc2804">Non-blocking Outputs: The Power of Threads</h2>
+
+<p>We&rsquo;ll start with output. Our basic strategy is going to be read a line from a
+subprocess and pass through to the mother process&rsquo;s <code>stdout</code>, prepended with an
+<code>A:</code> if it came from procedure <code>A</code> and a <code>B:</code> if it came from procedure <code>B</code>.
+However, there&rsquo;s a snag, and that snag is that the <code>read()</code> method of Python&rsquo;s
+file object is blocking: if our mother process is waiting to read from the
+<code>stdout</code> of <code>B</code> and no output is produced from <code>B</code>, then our mother process will
+just wait as long as it takes for some output to turn up. If no end of
+interesting output is coming from <code>A</code> it makes no odds, it just has to wait.</p>
+
+<p>What we need is a way of doing two things at once: reading from <code>A</code> and <code>B</code>
+simultaneously and putting a line from <code>A</code> or <code>B</code> to the mother process&rsquo;s
+<code>stdout</code> whenever one appears. Luckily, Python has a way of doing two things at
+once: the <a href="https://docs.python.org/2/library/threading.html"><code>threading</code></a>
+module.</p>
+
+<p>A thread, if you didn&rsquo;t know, is a lightweight separate thread of execution that
+shares the same memory space as the spawning thread. You make one in Python by
+calling the <code>Thread</code> constructor with a call something like this:
+<code>threading.Thread(target=function, args=(arg1, arg2))</code>. The argument <code>target</code> is
+the function that the thread will start at when the thread is started, and
+<code>args</code> is a tuple containing the arguments that will be passed to this function.</p>
+
+<p>A thread is started by calling its <code>start()</code> method, at which point the function
+<code>target</code> will be called in a separate thread of execution, running in parallel
+to the spawning thread, and any other threads.</p>
+
+<p>To get an idea of how threads work, take a look at this example program:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># simple_threading_eg.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">threading</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">random</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">time</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">test_fn</span><span style="color: #f8f8f2">(a,</span> <span style="color: #f8f8f2">b):</span>
+    <span style="color: #75715e"># pause a random number of seconds before doing anything else</span>
+    <span style="color: #f8f8f2">time</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">sleep(random</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">random())</span>
+
+    <span style="color: #66d9ef">print</span> <span style="color: #e6db74">&quot;{0} {1}&quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">format(a,</span> <span style="color: #f8f8f2">b)</span>
+
+
+<span style="color: #75715e"># make 4 threads, which will all end up calling the same function</span>
+<span style="color: #75715e"># (but will pass different arguments to it)</span>
+<span style="color: #f8f8f2">thread_1</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;john&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">thread_2</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;paul&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">thread_3</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">3</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;george&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">thread_4</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">4</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;ringo&quot;</span><span style="color: #f8f8f2">))</span>
+
+<span style="color: #75715e"># making a thread a `daemon` means that when the main process</span>
+<span style="color: #75715e"># ends the thread will end too</span>
+<span style="color: #f8f8f2">thread_1</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_2</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_3</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_4</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+
+<span style="color: #75715e"># start the threads running</span>
+<span style="color: #f8f8f2">thread_1</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_2</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_3</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_4</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+
+<span style="color: #75715e"># wait for all the child threads to terminate before ending</span>
+<span style="color: #f8f8f2">thread_1</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join()</span>
+<span style="color: #f8f8f2">thread_2</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join()</span>
+<span style="color: #f8f8f2">thread_3</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join()</span>
+<span style="color: #f8f8f2">thread_4</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join()</span>
+</pre></div>
+</p>
+
+<h2 id="communicating-between-threads:3d7f2b7fc46d7c825999d7e45bcc2804">Communicating Between Threads</h2>
+
+<p>This example creates four threads, all calling the same simple function with
+different arguments. The <code>target</code> function is set up to sleep for a random
+number of seconds before printing the arguments it was passed.</p>
+
+<p>When one of our threads reading a process&rsquo;s output gets some output, we need to
+pass that output back to our main thread in order to do some post processing and
+print it. How do we do that with threads?</p>
+
+<p>There is a Python module called
+<a href="https://docs.python.org/2/library/queue.html#Queue.Queue"><code>Queue</code></a> that
+implements a thread-safe queue, one thread can put objects on a queue and
+another thread can pop objects off, safe in the knowledge that these things are
+safe despite the fact that they may be happening simultaneously.</p>
+
+<p>A queue is created with:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f92672">import</span> <span style="color: #f8f8f2">Queue</span>
+<span style="color: #f8f8f2">q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+</pre></div>
+</p>
+
+<p>objects (in this case the variable <code>a</code>) are placed on it with:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">a</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">5</span>
+<span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">put(a)</span>
+</pre></div>
+</p>
+
+<p>and read off in a non-blocking way with:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f8f8f2">b</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+    <span style="color: #75715e"># b will now have the value &#39;5&#39; </span>
+<span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+    <span style="color: #66d9ef">pass</span>
+</pre></div>
+</p>
+
+<p>A simple example is given below, building on the simple introduction to threads
+that was introduced before. In this case, the string that the <code>test_fn</code> produces
+after a random period of time is put on a queue. The main thread has an infinite
+loop that keeps checking if anything is on the queue, and it is the main thread
+which does the printing if something is found:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># simple_threading_queue_eg.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">threading</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">random</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">time</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">Queue</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">test_fn</span><span style="color: #f8f8f2">(a,</span> <span style="color: #f8f8f2">b,</span> <span style="color: #f8f8f2">q):</span>
+    <span style="color: #75715e"># pause a random number of seconds before doing anything else</span>
+    <span style="color: #f8f8f2">time</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">sleep(random</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">random())</span>
+
+    <span style="color: #75715e"># put a message on the queue</span>
+    <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">put(</span><span style="color: #e6db74">&quot;{0} {1}&quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">format(a,</span> <span style="color: #f8f8f2">b))</span>
+
+
+<span style="color: #f8f8f2">q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+
+<span style="color: #75715e"># make 4 threads, which will all end up calling the same function</span>
+<span style="color: #75715e"># (but will pass different arguments to it)</span>
+<span style="color: #f8f8f2">thread_1</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">1</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;john&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">q))</span>
+<span style="color: #f8f8f2">thread_2</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">2</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;paul&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">q))</span>
+<span style="color: #f8f8f2">thread_3</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">3</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;george&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">q))</span>
+<span style="color: #f8f8f2">thread_4</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">test_fn,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(</span><span style="color: #ae81ff">4</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;ringo&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">q))</span>
+
+<span style="color: #75715e"># making a thread a `daemon` means that when the main process</span>
+<span style="color: #75715e"># ends the thread will end too</span>
+<span style="color: #f8f8f2">thread_1</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_2</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_3</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">thread_4</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+
+<span style="color: #75715e"># start the threads running</span>
+<span style="color: #f8f8f2">thread_1</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_2</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_3</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">thread_4</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #75715e"># if there is any message on the queue, print it.</span>
+        <span style="color: #75715e"># if the queue is empty, the exception will be caught</span>
+        <span style="color: #75715e"># and the queue polled again in a moment</span>
+        <span style="color: #66d9ef">print</span> <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+</pre></div>
+</p>
+
+<h2 id="implementing-non-blocking-output:3d7f2b7fc46d7c825999d7e45bcc2804">Implementing Non-Blocking Output</h2>
+
+<p>That last example came very close to having the functionality we desired of our
+non-blocking output. We now need to take the principles explored in
+<code>simple_threading_queue_eg.py</code> and apply them to putting output from process A
+and B&rsquo;s <code>stdout</code> onto a queue, rather than just any old string.</p>
+
+<p>We want the target function of our output reading threads to keep attempting to
+read from their target pipes, whenever they manage to read a whole line of
+something we want them to put this line onto a queue:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">read_output</span><span style="color: #f8f8f2">(pipe,</span> <span style="color: #f8f8f2">q):</span>
+    <span style="color: #e6db74">&quot;&quot;&quot;reads output from `pipe`, when line has been read, puts</span>
+<span style="color: #e6db74">line on Queue `q`&quot;&quot;&quot;</span>
+
+    <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pipe</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">readline()</span>
+        <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">put(l)</span>
+</pre></div>
+</p>
+
+<p>A thread that reads from the <code>stdout</code> of procedure <code>A</code> and put any output it
+finds into a queue, <code>pa_q</code> can be started like this:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># queue for storing output lines</span>
+<span style="color: #f8f8f2">pa_q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+
+<span style="color: #75715e"># start a pair of thread to read output from procedures A</span>
+<span style="color: #f8f8f2">pa_t</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_output,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout,</span> <span style="color: #f8f8f2">pa_q))</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+</pre></div>
+</p>
+
+<p>with a similar sequence needed for procedure <code>B</code>.</p>
+
+<p>With these threads busily running in the background, putting any output they get
+onto a queue named <code>pa_q</code> for process <code>A</code>, or <code>pb_q</code> for <code>B</code>, we want our main
+thread to loop, periodically checking the queues to see if process <code>A</code> or <code>B</code> has
+produced any output. Upon finding some, we just prepend the letter of the
+producing process and print the message:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+    <span style="color: #75715e"># ...</span>
+
+    <span style="color: #75715e"># write output from procedure A (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pa_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;A: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+
+    <span style="color: #75715e"># write output from procedure B (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pb_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;B: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+</pre></div>
+</p>
+
+<p>And that should be it! Putting this all together into a working script:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># two_subprocesses_with_output.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">subprocess</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">threading</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">sys</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">Queue</span>
+
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">read_output</span><span style="color: #f8f8f2">(pipe,</span> <span style="color: #f8f8f2">q):</span>
+    <span style="color: #e6db74">&quot;&quot;&quot;reads output from `pipe`, when line has been read, puts</span>
+<span style="color: #e6db74">line on Queue `q`&quot;&quot;&quot;</span>
+
+    <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pipe</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">readline()</span>
+        <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">put(l)</span>
+
+<span style="color: #75715e"># start both `proc_a.py` and `proc_b.py`</span>
+<span style="color: #f8f8f2">proc_a</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_a.py&quot;</span><span style="color: #f8f8f2">],</span>
+    <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span> <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+<span style="color: #f8f8f2">proc_b</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_b.py&quot;</span><span style="color: #f8f8f2">],</span>
+    <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span> <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+
+<span style="color: #75715e"># queues for storing output lines</span>
+<span style="color: #f8f8f2">pa_q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+<span style="color: #f8f8f2">pb_q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+
+<span style="color: #75715e"># start a pair of threads to read output from procedures A and B</span>
+<span style="color: #f8f8f2">pa_t</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_output,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout,</span> <span style="color: #f8f8f2">pa_q))</span>
+<span style="color: #f8f8f2">pb_t</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_output,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout,</span> <span style="color: #f8f8f2">pb_q))</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pb_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">pb_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+    <span style="color: #75715e"># check if either sub-process has finished</span>
+    <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+    <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None</span> <span style="color: #f92672">or</span> <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None:</span>
+        <span style="color: #66d9ef">break</span>
+
+    <span style="color: #75715e"># write output from procedure A (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pa_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;A: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+
+    <span style="color: #75715e"># write output from procedure B (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pb_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;B: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+</pre></div>
+</p>
+
+<p>Running this will result in the output of both sub procedures being multiplexed
+and printed out together:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">B:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">B</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+</pre></div>
+</p>
+
+<h2 id="non-blocking-input:3d7f2b7fc46d7c825999d7e45bcc2804">Non-blocking Input</h2>
+
+<p>The way we want input for our test harness to work is like this, we want to have
+two named pipes in the file system, <code>proc_a_input</code> and <code>proc_b_input</code>, for which
+attempts are constantly made to open and read from them. Whenever anything is
+read from either it can be passed directly to the <code>stdin</code> of the appropriate
+process.</p>
+
+<p>This case is actually a little simpler than the output case, since we don&rsquo;t have
+to make any communication back to the main thread.</p>
+
+<p>The target function of our input threads will look like what we had in
+<a href="/2017/03/python-and-pipes-part-5-subprocesses-and-pipes#external_pipe_say_my_name_constant">external_pipe_say_my_name_constant.py</a>,
+i.e.:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">read_input</span><span style="color: #f8f8f2">(write_pipe,</span> <span style="color: #f8f8f2">in_pipe_name):</span>
+    <span style="color: #e6db74">&quot;&quot;&quot;reads input from a pipe with name `read_pipe_name`,</span>
+<span style="color: #e6db74">writing this input straight into `write_pipe`&quot;&quot;&quot;</span>
+    <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+        <span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(in_pipe_name,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+            <span style="color: #f8f8f2">write_pipe</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(f</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">read())</span>
+</pre></div>
+</p>
+
+<p>where <code>write_pipe</code> will be the <code>stdin</code> of our processes <code>A</code> and <code>B</code>, and
+<code>in_pipe_name</code> will be the name of the external pipes in our file system,
+<code>proc_a_input</code> and <code>proc_b_input</code>. For procedure <code>A</code>, for example:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># start a thread to read input into procedure A</span>
+<span style="color: #f8f8f2">pa_input_thread</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_input,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdin,</span> <span style="color: #e6db74">&quot;proc_a_input&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">pa_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pa_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+</pre></div>
+</p>
+
+<p>With everything mashed together you&rsquo;ll get a program like this:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #75715e"># two_subprocesses_with_output_and_input.py</span>
+
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">subprocess</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">threading</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">sys</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">Queue</span>
+
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">read_output</span><span style="color: #f8f8f2">(pipe,</span> <span style="color: #f8f8f2">q):</span>
+    <span style="color: #e6db74">&quot;&quot;&quot;reads output from `pipe`, when line has been read, puts</span>
+<span style="color: #e6db74">line on Queue `q`&quot;&quot;&quot;</span>
+
+    <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pipe</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">readline()</span>
+        <span style="color: #f8f8f2">q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">put(l)</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">read_input</span><span style="color: #f8f8f2">(write_pipe,</span> <span style="color: #f8f8f2">in_pipe_name):</span>
+    <span style="color: #e6db74">&quot;&quot;&quot;reads input from a pipe with name `read_pipe_name`,</span>
+<span style="color: #e6db74">writing this input straight into `write_pipe`&quot;&quot;&quot;</span>
+    <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+        <span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(in_pipe_name,</span> <span style="color: #e6db74">&quot;r&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+            <span style="color: #f8f8f2">write_pipe</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(f</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">read())</span>
+
+<span style="color: #75715e"># start both `proc_a.py` and `proc_b.py`</span>
+<span style="color: #f8f8f2">proc_a</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_a.py&quot;</span><span style="color: #f8f8f2">],</span>
+    <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span> <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+<span style="color: #f8f8f2">proc_b</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen([</span><span style="color: #e6db74">&quot;stdbuf&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;-o0&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;python2&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;proc_b.py&quot;</span><span style="color: #f8f8f2">],</span>
+    <span style="color: #f8f8f2">stdin</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE,</span> <span style="color: #f8f8f2">stdout</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PIPE)</span>
+
+<span style="color: #75715e"># lists for storing the lines of output generated</span>
+<span style="color: #f8f8f2">pa_line_buffer</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[]</span> 
+<span style="color: #f8f8f2">pb_line_buffer</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[]</span> 
+
+<span style="color: #75715e"># queues for storing output lines</span>
+<span style="color: #f8f8f2">pa_q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+<span style="color: #f8f8f2">pb_q</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Queue()</span>
+
+<span style="color: #75715e"># start a pair of threads to read output from procedures A and B</span>
+<span style="color: #f8f8f2">pa_t</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_output,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout,</span> <span style="color: #f8f8f2">pa_q))</span>
+<span style="color: #f8f8f2">pb_t</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_output,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout,</span> <span style="color: #f8f8f2">pb_q))</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pb_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pa_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">pb_t</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+
+<span style="color: #75715e"># start a pair of threads to read input into procedures A and B</span>
+<span style="color: #f8f8f2">pa_input_thread</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_input,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdin,</span> <span style="color: #e6db74">&quot;proc_a_input&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">pb_input_thread</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">threading</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Thread(target</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">read_input,</span> <span style="color: #f8f8f2">args</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">(proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdin,</span> <span style="color: #e6db74">&quot;proc_b_input&quot;</span><span style="color: #f8f8f2">))</span>
+<span style="color: #f8f8f2">pa_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pb_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">daemon</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">True</span>
+<span style="color: #f8f8f2">pa_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+<span style="color: #f8f8f2">pb_input_thread</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">start()</span>
+
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">True:</span>
+    <span style="color: #75715e"># check if either sub-process has finished</span>
+    <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+    <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">poll()</span>
+
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">proc_a</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None</span> <span style="color: #f92672">or</span> <span style="color: #f8f8f2">proc_b</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">returncode</span> <span style="color: #f92672">is</span> <span style="color: #f92672">not</span> <span style="color: #f8f8f2">None:</span>
+        <span style="color: #66d9ef">break</span>
+
+    <span style="color: #75715e"># write output from procedure A (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pa_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;A: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+
+    <span style="color: #75715e"># write output from procedure B (if there is any)</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">l</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">pb_q</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(False)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;B: &quot;</span><span style="color: #f8f8f2">)</span>
+        <span style="color: #f8f8f2">sys</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">stdout</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(l)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">Queue</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Empty:</span>
+        <span style="color: #66d9ef">pass</span>
+</pre></div>
+</p>
+
+<h2 id="running-the-suite:3d7f2b7fc46d7c825999d7e45bcc2804">Running the Suite</h2>
+
+<p>Now all that is left to do is give the suite a test-drive an check that it
+works. In the same directory that you&rsquo;re going to be running the script make
+sure you&rsquo;ve got two named pipes <code>proc_a_input</code> and <code>proc_b_input</code>:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">mkfifo</span> <span style="color: #f8f8f2">proc_a_input</span>
+<span style="color: #f8f8f2">mkfifo</span> <span style="color: #f8f8f2">proc_b_input</span>
+</pre></div>
+</p>
+
+<p>then you can run <code>two_subprocesses_with_output_and_input.py</code>. In another
+terminal, by piping input into <code>proc_a_input</code> or <code>proc_b_input</code> you should see
+the consequences of that input reflected in the output of the suite, for example:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%">    <span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">hi</span> <span style="color: #f8f8f2">there</span> <span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">proc_a_input</span>
+</pre></div>
+</p>
+
+<p>in another terminal should give you the output:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">B:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">B</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">Proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">says,</span> <span style="color: #e6db74">&quot;hi there&quot;</span>
+<span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+</pre></div>
+</p>
+
+<p>and following this with:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%">    <span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">hi</span> <span style="color: #f8f8f2">from</span> <span style="color: #f8f8f2">b</span> <span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">proc_b_input</span>
+</pre></div>
+</p>
+
+<p>will give you the output:</p>
+
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">B:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">B</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">Proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">says,</span> <span style="color: #e6db74">&quot;hi there&quot;</span>
+<span style="color: #f8f8f2">A:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">A</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+<span style="color: #f8f8f2">B:</span> <span style="color: #f8f8f2">Proc</span> <span style="color: #f8f8f2">B</span> <span style="color: #f8f8f2">says,</span> <span style="color: #e6db74">&quot;hi from b&quot;</span>
+<span style="color: #f8f8f2">B:</span> <span style="color: #f8f8f2">what</span> <span style="color: #f8f8f2">should</span> <span style="color: #f8f8f2">proc</span> <span style="color: #f8f8f2">B</span> <span style="color: #f8f8f2">say</span><span style="color: #f92672">?</span>
+</pre></div>
+</p>
+
+<p>Naturally this is a simple example, but if you are trying to test a
+server-client architecture it can be very powerful and labour saving.
+Since all the output goes through the main thread, you can check that your
+server and client are in appropriate states before handing interactive control
+over to the user.</p>
+
+<p>As an illustration, I needed to prompt my client to send a couple of messages to
+the server before I wanted to do interactive testing. This was a trivial task of
+sending the appropriate messages through the client&rsquo;s <code>stdin</code> and checking for
+the correct responses from the server&rsquo;s <code>stdout</code> before starting the threaded
+input and the event loop of the main process.</p>
+
+<p>I hope this exploration of Python pipes and subprocesses will save you a similar
+amount of time in the future!</p>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="twelve columns">
+		&nbsp;
+	</div>
+</div>
+
+<div id="footer" class="row">
+	<div class="twelve columns">
+		<center>
+			<span style="font-size: small;">
+				[ theme created by <a href="http://github.com/esell" class="copyright-link" target="#">esell</a> ]
+			</span>
+		</center>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
+
+

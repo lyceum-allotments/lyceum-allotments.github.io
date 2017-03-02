@@ -3,7 +3,38 @@
   
   <url>
     <loc>https://lyceum-allotments.github.io/</loc>
-    <lastmod>2016-08-03T10:14:48+01:00</lastmod>
+    <lastmod>2017-03-02T23:46:37+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-6-multiple-subprocesses-and-pipes/</loc>
+    <lastmod>2017-03-02T23:46:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-5-subprocesses-and-pipes/</loc>
+    <lastmod>2017-03-02T23:44:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-4-on-the-buffers/</loc>
+    <lastmod>2017-03-02T23:43:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-3-pipes-in-python/</loc>
+    <lastmod>2017-03-02T23:42:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes-part-2-introduction-to-unix-pipes/</loc>
+    <lastmod>2017-03-02T23:41:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lyceum-allotments.github.io/2017/03/python-and-pipes/</loc>
+    <lastmod>2017-03-02T23:40:37+00:00</lastmod>
   </url>
   
   <url>
